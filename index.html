@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CYBERSPACE // HUD CORE SYSTEM v4.09</title>
+  <style>
+    /* -------------------------------------------------------------
+       GLOBAL RESET & BASE STYLES
+       ------------------------------------------------------------- */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #02040a;
+      font-family: 'Consolas', 'Courier New', Monaco, monospace;
+      color: #00f3ff;
+    }
+
+    #canvas-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    /* -------------------------------------------------------------
+       CRT & SCANLINE VISUAL EFFECTS
+       ------------------------------------------------------------- */
+    .scanlines {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      pointer-events: none;
+      background: linear-gradient(
+        rgba(18, 16, 16, 0) 50%, 
+        rgba(0, 0, 0, 0.35) 50%
+      ), linear-gradient(
+        90deg,
+        rgba(255, 0, 0, 0.03),
+        rgba(0, 255, 0, 0.01),
+        rgba(0, 0, 255, 0.03)
+      );
+      background-size: 100% 4px, 6px 100%;
+      opacity: 0.8;
+    }
+
+    .vignette {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 11;
+      pointer-events: none;
+      background: radial-gradient(circle, rgba(0,0,0,0) 50%, rgba(2, 4, 10, 0.85) 100%);
+    }
+
+    /* -------------------------------------------------------------
+       HUD OVERLAY LAYOUT
+       ------------------------------------------------------------- */
+    .hud-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 20;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 24px;
+      box-sizing: border-box;
+      text-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
+    }
+
+    /* Enable clicking on specific interactive controls */
+    .interactive {
+      pointer-events: auto !important;
+    }
+
+    /* CORNER BRACKETS */
+    .corner {
+      position: absolute;
+      width: 32px;
+      height: 32px;
+      border: 2px solid #00f3ff;
+      opacity: 0.8;
+    }
+    .top-left { top: 16px; left: 16px; border-right: none; border-bottom: none; }
+    .top-right { top: 16px; right: 16px; border-left: none; border-bottom: none; }
+    .bottom-left { bottom: 16px; left: 16px; border-right: none; border-top: none; }
+    .bottom-right { bottom: 16px; right: 16px; border-left: none; border-top: none; }
+
+    /* HEADER HUD */
+    .hud-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(0, 243, 255, 0.3);
+      padding-bottom: 12px;
+      background: linear-gradient(90deg, rgba(0, 243, 255, 0.1), transparent);
+    }
+
+    .system-title {
+      font-size: 1.2rem;
+      font-weight: bold;
+      letter-spacing: 2px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      background-color: #00ff66;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #00ff66;
+      animation: blink 1.2s infinite alternate;
+    }
+
+    @keyframes blink {
+      0% { opacity: 0.2; }
+      100% { opacity: 1; }
+    }
+
+    /* MIDDLE CONTENT PANELS */
+    .hud-body {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 100%;
+      margin: 16px 0;
+    }
+
+    .panel {
+      background: rgba(2, 8, 20, 0.55);
+      border: 1px solid rgba(0, 243, 255, 0.25);
+      backdrop-filter: blur(4px);
+      padding: 16px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      line-height: 1.5;
+    }
+
+    .left-panel {
+      width: 260px;
+      max-height: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .right-panel {
+      width: 280px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .hex-stream {
+      font-size: 0.72rem;
+      color: rgba(0, 243, 255, 0.7);
+      word-break: break-all;
+      max-height: 120px;
+      overflow: hidden;
+    }
+
+    .stat-bar-container {
+      margin-top: 4px;
+    }
+
+    .stat-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      margin-bottom: 4px;
+    }
+
+    .stat-bar {
+      width: 100%;
+      height: 6px;
+      background: rgba(0, 243, 255, 0.15);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .stat-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #00f3ff, #ff007f);
+      width: 50%;
+      transition: width 0.4s ease;
+    }
+
+    /* FOOTER HUD & TERMINAL LOGS */
+    .hud-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-top: 1px solid rgba(0, 243, 255, 0.3);
+      padding-top: 12px;
+      background: linear-gradient(270deg, rgba(0, 243, 255, 0.1), transparent);
+    }
+
+    .terminal-box {
+      width: 500px;
+      height: 90px;
+      background: rgba(0, 5, 15, 0.7);
+      border: 1px solid rgba(0, 243, 255, 0.3);
+      padding: 10px;
+      font-size: 0.75rem;
+      color: #00ff66;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    .terminal-line {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .cyber-btn {
+      background: rgba(0, 243, 255, 0.1);
+      border: 1px solid #00f3ff;
+      color: #00f3ff;
+      padding: 10px 20px;
+      font-family: inherit;
+      font-weight: bold;
+      letter-spacing: 1.5px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+    }
+
+    .cyber-btn:hover {
+      background: #00f3ff;
+      color: #02040a;
+      box-shadow: 0 0 15px #00f3ff;
+    }
+
+    /* WEBGL FALLBACK STYLES */
+    #webgl-error {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #ff0055;
+      font-size: 1.2rem;
+      text-align: center;
+      border: 2px solid #ff0055;
+      padding: 20px;
+      background: rgba(10, 0, 5, 0.9);
+      z-index: 100;
+    }
+
+    @media (max-width: 768px) {
+      .left-panel, .right-panel { display: none; }
+      .terminal-box { width: 100%; }
+    }
+  </style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+  <!-- WebGL Canvas Container -->
+  <div id="canvas-container"></div>
+
+  <!-- CRT Visual Filters -->
+  <div class="scanlines"></div>
+  <div class="vignette"></div>
+
+  <!-- HUD Decorative Framework -->
+  <div class="hud-overlay">
+    <div class="corner top-left"></div>
+    <div class="corner top-right"></div>
+    <div class="corner bottom-left"></div>
+    <div class="corner bottom-right"></div>
+
+    <!-- Top Navigation / Status Header -->
+    <header class="hud-header">
+      <div class="system-title">
+        <div class="status-dot"></div>
+        <span>CYBER_NET // NODE: 0x88F-A</span>
+      </div>
+      <div id="clock-display">00:00:00.000</div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <div class="hud-body">
+      <!-- Left Diagnostics Panel -->
+      <div class="panel left-panel">
+        <div><strong>SYS_DIAGNOSTICS</strong></div>
+        <div class="hex-stream" id="hex-stream-box">
+          41 78 69 6f 6d 20 4e 65 74 77 6f 72 6b 20 53 65 63 75 72 69 74 79 20 4c 6f 67 0a
+        </div>
+        <div class="stat-bar-container">
+          <div class="stat-label"><span>CORE LOAD</span><span id="load-val">42%</span></div>
+          <div class="stat-bar"><div class="stat-fill" id="load-bar" style="width: 42%;"></div></div>
+        </div>
+        <div class="stat-bar-container">
+          <div class="stat-label"><span>QUANTUM ENTROPY</span><span id="entropy-val">88%</span></div>
+          <div class="stat-bar"><div class="stat-fill" id="entropy-bar" style="width: 88%; background: linear-gradient(90deg, #00ff66, #00f3ff);"></div></div>
+        </div>
+      </div>
+
+      <!-- Right System Metrics Panel -->
+      <div class="panel right-panel">
+        <div><strong>SECURITY PROTOCOL</strong></div>
+        <div style="color: #00ff66;">[LEVEL 5 ENCRYPTION ACTIVE]</div>
+        <hr style="border: 0; border-top: 1px solid rgba(0,243,255,0.2); margin: 8px 0;">
+        <div>TARGET: NEURAL_CORE_V4</div>
+        <div>LATENCY: 12ms</div>
+        <div>NODES LINKED: 1,024</div>
+        <div style="margin-top: 8px;">
+          <small>BEACON PULSE: SYNCHRONIZED</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Controls and Live Log Terminal -->
+    <footer class="hud-footer">
+      <div class="terminal-box" id="terminal">
+        <div class="terminal-line">&gt; SYSTEM INITIALIZATION COMPLETE.</div>
+        <div class="terminal-line">&gt; READY FOR DATA INTERACTION.</div>
+      </div>
+      <button class="cyber-btn interactive" id="overdrive-btn" onclick="toggleOverdrive()">PULSE CORE</button>
+    </footer>
+  </div>
+
+  <!-- Fallback Error Banner for Non-WebGL Devices -->
+  <div id="webgl-error">
+    ERROR: WebGL is not supported or disabled in your browser.
+  </div>
+
+  <script>
+    // Global Three.js Scene Variables
+    let scene, camera, renderer;
+    let cyberCore, coreWireframe, outerRings = [], floatingCubes = [], particleSystem;
+    let gridHelper;
+    
+    // Animation & Interaction Variables
+    let clock = new THREE.Clock();
+    let mouseX = 0, mouseY = 0;
+    let targetCameraX = 0, targetCameraY = 0;
+    let overdriveActive = false;
+    let overdriveTimer = 0;
+
+    function isWebGLAvailable() {
+      try {
+        const canvas = document.createElement('canvas');
+        return !!(window.WebGLRenderingContext && (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+      } catch (e) {
+        return false;
+      }
+    }
+
+    if (!isWebGLAvailable()) {
+      document.getElementById('webgl-error').style.display = 'block';
+    } else {
+      window.addEventListener('load', init);
+    }
+
+    function init() {
+      const container = document.getElementById('canvas-container');
+
+      // Create Scene
+      scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0x02040a, 0.015);
+
+      // Create Camera
+      camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.set(0, 5, 25);
+
+      // Create Renderer
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      container.appendChild(renderer.domElement);
+
+      // Add Lights
+      const ambientLight = new THREE.AmbientLight(0x00f3ff, 0.4);
+      scene.add(ambientLight);
+
+      const coreLight = new THREE.PointLight(0x00f3ff, 2, 50);
+      coreLight.position.set(0, 0, 0);
+      scene.add(coreLight);
+
+      const magentaLight = new THREE.PointLight(0xff007f, 3, 40);
+      magentaLight.position.set(10, 10, 10);
+      scene.add(magentaLight);
+
+      createCyberCore();
+      createGridFloor();
+      createFloatingDataCubes();
+      createParticleStream();
+
+      // Interaction listeners
+      document.addEventListener('mousemove', onPointerMove);
+      window.addEventListener('resize', onWindowResize);
+
+      // Start Terminal Dynamic Text Stream
+      startTerminalStream();
+
+      // Start Rendering Loop
+      animate();
+    }
+
+    function createCyberCore() {
+      const coreGroup = new THREE.Group();
+
+      // 1. Inner Geometry (Icosahedron Cores)
+      const geoInner = new THREE.IcosahedronGeometry(3, 1);
+      const matInner = new THREE.MeshPhongMaterial({
+        color: 0x02040a,
+        emissive: 0x00f3ff,
+        emissiveIntensity: 0.5,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.85
+      });
+      cyberCore = new THREE.Mesh(geoInner, matInner);
+      coreGroup.add(cyberCore);
+
+      // 2. Outer Wireframe Shell
+      const geoOuter = new THREE.IcosahedronGeometry(4.2, 1);
+      const matOuter = new THREE.MeshBasicMaterial({
+        color: 0xff007f,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.4
+      });
+      coreWireframe = new THREE.Mesh(geoOuter, matOuter);
+      coreGroup.add(coreWireframe);
+
+      // 3. Concentric Orbital Cyber Rings
+      const ringGeometries = [
+        new THREE.TorusGeometry(5.5, 0.04, 16, 100),
+        new THREE.TorusGeometry(6.8, 0.03, 16, 100),
+        new THREE.TorusGeometry(8.2, 0.05, 16, 100)
+      ];
+
+      const ringColors = [0x00f3ff, 0x00ff66, 0xff007f];
+
+      ringGeometries.forEach((geo, i) => {
+        const mat = new THREE.MeshBasicMaterial({
+          color: ringColors[i],
+          wireframe: true,
+          transparent: true,
+          opacity: 0.7
+        });
+        const ring = new THREE.Mesh(geo, mat);
+        ring.rotation.x = Math.PI * Math.random();
+        ring.rotation.y = Math.PI * Math.random();
+        outerRings.push(ring);
+        coreGroup.add(ring);
+      });
+
+      scene.add(coreGroup);
+    }
+
+    function createGridFloor() {
+      // Create Infinite-looking Grid Floor using GridHelper
+      const size = 200;
+      const divisions = 80;
+      gridHelper = new THREE.GridHelper(size, divisions, 0x00f3ff, 0x002b47);
+      gridHelper.position.y = -8;
+      scene.add(gridHelper);
+    }
+
+    function createFloatingDataCubes() {
+      const cubeGeo = new THREE.BoxGeometry(1, 1, 1);
+      const cubeMat = new THREE.MeshBasicMaterial({
+        color: 0x00f3ff,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.35
+      });
+
+      for (let i = 0; i < 45; i++) {
+        const cube = new THREE.Mesh(cubeGeo, cubeMat);
+        
+        // Random positioning in cyber space
+        cube.position.x = (Math.random() - 0.5) * 80;
+        cube.position.y = (Math.random() - 0.5) * 40;
+        cube.position.z = (Math.random() - 0.5) * 80;
+
+        // Random rotation & scale
+        cube.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
+        const scale = 0.5 + Math.random() * 2;
+        cube.scale.set(scale, scale, scale);
+
+        // Custom animation speed property
+        cube.userData = {
+          rotSpeedX: (Math.random() - 0.5) * 0.02,
+          rotSpeedY: (Math.random() - 0.5) * 0.02,
+          floatOffset: Math.random() * Math.PI * 2
+        };
+
+        floatingCubes.push(cube);
+        scene.add(cube);
+      }
+    }
+
+    function createParticleStream() {
+      const particleCount = 1500;
+      const geometry = new THREE.BufferGeometry();
+      const positions = new Float32Array(particleCount * 3);
+      const colors = new Float32Array(particleCount * 3);
+
+      const colorPalette = [
+        new THREE.Color(0x00f3ff),
+        new THREE.Color(0x00ff66),
+        new THREE.Color(0xff007f)
+      ];
+
+      for (let i = 0; i < particleCount; i++) {
+        positions[i * 3] = (Math.random() - 0.5) * 120;
+        positions[i * 3 + 1] = (Math.random() - 0.5) * 80;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 120;
+
+        const col = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+        colors[i * 3] = col.r;
+        colors[i * 3 + 1] = col.g;
+        colors[i * 3 + 2] = col.b;
+      }
+
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+      // Custom Glowing Particle Texture Generator
+      const canvas = document.createElement('canvas');
+      canvas.width = 16;
+      canvas.height = 16;
+      const ctx = canvas.getContext('2d');
+      const grad = ctx.createRadialGradient(8, 8, 0, 8, 8, 8);
+      grad.addColorStop(0, 'rgba(255,255,255,1)');
+      grad.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 16, 16);
+
+      const particleTexture = new THREE.CanvasTexture(canvas);
+
+      const material = new THREE.PointsMaterial({
+        size: 0.8,
+        vertexColors: true,
+        map: particleTexture,
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+
+      particleSystem = new THREE.Points(geometry, material);
+      scene.add(particleSystem);
+    }
+
+    function onPointerMove(event) {
+      mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+      mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+
+      targetCameraX = mouseX * 6;
+      targetCameraY = mouseY * 4 + 5;
+    }
+
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    function toggleOverdrive() {
+      overdriveActive = true;
+      overdriveTimer = 1.5; // Duration in seconds
+      
+      const btn = document.getElementById('overdrive-btn');
+      btn.innerText = "PULSING...";
+      btn.style.borderColor = "#ff007f";
+      btn.style.color = "#ff007f";
+
+      addTerminalLog(">> WARNING: CORE OVERDRIVE PULSE TRIGGERED!");
+      addTerminalLog(">> QUANTUM FLUX ELEVATED.");
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      const elapsedTime = clock.getElapsedTime();
+      const deltaTime = clock.getDelta();
+
+      // 1. Smooth Camera Parallax Tracking
+      camera.position.x += (targetCameraX - camera.position.x) * 0.05;
+      camera.position.y += (targetCameraY - camera.position.y) * 0.05;
+      camera.lookAt(0, 0, 0);
+
+      // 2. Animate Central Core
+      let pulseSpeed = overdriveActive ? 4.0 : 1.0;
+      
+      cyberCore.rotation.x = elapsedTime * 0.3 * pulseSpeed;
+      cyberCore.rotation.y = elapsedTime * 0.5 * pulseSpeed;
+
+      coreWireframe.rotation.x = -elapsedTime * 0.2 * pulseSpeed;
+      coreWireframe.rotation.y = -elapsedTime * 0.4 * pulseSpeed;
+
+      // Pulsing Scale Effect
+      const scaleVal = 1 + Math.sin(elapsedTime * 3 * pulseSpeed) * 0.08;
+      cyberCore.scale.set(scaleVal, scaleVal, scaleVal);
+
+      // 3. Rotate Orbital Rings
+      outerRings.forEach((ring, index) => {
+        const mult = (index % 2 === 0 ? 1 : -1) * pulseSpeed;
+        ring.rotation.x += 0.005 * mult;
+        ring.rotation.y += 0.008 * mult;
+        ring.rotation.z += 0.003 * mult;
+      });
+
+      // 4. Grid Floor Infinite Motion Effect
+      gridHelper.position.z = (elapsedTime * 4 * pulseSpeed) % 2.5;
+
+      // 5. Animate Floating Cubes
+      floatingCubes.forEach((cube) => {
+        cube.rotation.x += cube.userData.rotSpeedX;
+        cube.rotation.y += cube.userData.rotSpeedY;
+        cube.position.y += Math.sin(elapsedTime + cube.userData.floatOffset) * 0.01;
+      });
+
+      // 6. Particle System Stream Rotation & Flow
+      if (particleSystem) {
+        particleSystem.rotation.y = elapsedTime * 0.03;
+        const positions = particleSystem.geometry.attributes.position.array;
+        for (let i = 1; i < positions.length; i += 3) {
+          positions[i] += 0.05 * pulseSpeed;
+          if (positions[i] > 40) {
+            positions[i] = -40;
+          }
+        }
+        particleSystem.geometry.attributes.position.needsUpdate = true;
+      }
+
+      // Handle Overdrive Timer Decay
+      if (overdriveActive) {
+        overdriveTimer -= 0.016;
+        if (overdriveTimer <= 0) {
+          overdriveActive = false;
+          const btn = document.getElementById('overdrive-btn');
+          btn.innerText = "PULSE CORE";
+          btn.style.borderColor = "#00f3ff";
+          btn.style.color = "#00f3ff";
+        }
+      }
+
+      // Update Dynamic UI HUD Text Metrics
+      updateHUDMetrics(elapsedTime);
+
+      renderer.render(scene, camera);
+    }
+
+    function updateHUDMetrics(time) {
+      // Digital Clock
+      const now = new Date();
+      const timeStr = now.toTimeString().split(' ')[0] + '.' + String(now.getMilliseconds()).padStart(3, '0').slice(0, 2);
+      document.getElementById('clock-display').innerText = timeStr;
+
+      // Dynamic System Metrics Updates
+      if (Math.floor(time * 10) % 5 === 0) {
+        const loadVal = Math.floor(40 + Math.sin(time * 2) * 20 + (overdriveActive ? 35 : 0));
+        document.getElementById('load-val').innerText = `${loadVal}%`;
+        document.getElementById('load-bar').style.width = `${loadVal}%`;
+
+        const entropyVal = Math.floor(75 + Math.cos(time * 1.5) * 15);
+        document.getElementById('entropy-val').innerText = `${entropyVal}%`;
+        document.getElementById('entropy-bar').style.width = `${entropyVal}%`;
+
+        // Generate Random Hex Output Stream
+        const hexBox = document.getElementById('hex-stream-box');
+        let hexStr = "";
+        for (let i = 0; i < 28; i++) {
+          hexStr += Math.floor(Math.random() * 256).toString(16).padStart(2, '0').toUpperCase() + " ";
+        }
+        hexBox.innerText = hexStr;
+      }
+    }
+
+    // Dynamic Live Terminal Log Generator
+    const dummyLogs = [
+      "SYNCHRONIZING QUANTUM MESH...",
+      "PACKET INTERCEPTED: IP 192.168.104.88",
+      "DECRYPTING RSA-4096 HANDSHAKE...",
+      "SECURITY LAYER: OPTIMAL",
+      "ANALYZING NEURAL DATA NODES...",
+      "INCOMING TELEMETRY STREAM DETECTED",
+      "BUFFER MEMORY PURGED 0x00F8"
+    ];
+
+    function startTerminalStream() {
+      setInterval(() => {
+        if (Math.random() > 0.4) {
+          const randomLog = dummyLogs[Math.floor(Math.random() * dummyLogs.length)];
+          addTerminalLog("> " + randomLog);
+        }
+      }, 2500);
+    }
+
+    function addTerminalLog(msg) {
+      const terminal = document.getElementById('terminal');
+      const line = document.createElement('div');
+      line.className = 'terminal-line';
+      line.innerText = msg;
+      terminal.appendChild(line);
+
+      // Keep terminal scroll attached to bottom
+      if (terminal.childNodes.length > 5) {
+        terminal.removeChild(terminal.firstChild);
+      }
+    }
+  </script>
+</body>
+</html>
