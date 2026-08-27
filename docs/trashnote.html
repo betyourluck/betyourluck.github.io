@@ -13,23 +13,25 @@
   <link id="manifest-placeholder" rel="manifest">
   <meta name="theme-color" content="#18181b">
 
-  <!-- Marked.js for Markdown Rendering -->
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- CDN Preconnect & DNS Prefetch (Fastest HTTP/2 Handshake) -->
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
 
-  <!-- Monaco Editor Loader with Japanese Locale -->
+  <!-- Marked.js for Markdown Rendering (cdnjs unified) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.1/marked.min.js" defer></script>
+
+  <!-- Monaco Editor Ultra-Lightweight Loader -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
   <script>
-    var require = { 
+    require.config({
       paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' },
       'vs/nls': {
         availableLanguages: {
           '*': 'ja'
         }
       }
-    };
+    });
   </script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/editor/editor.main.nls.ja.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/editor/editor.main.js"></script>
 
   <style>
     /* =========================================================
@@ -1833,16 +1835,9 @@
       }
     });
 
-    // アプリ初期化実行
+    // アプリ初期化実行 (非同期ロード完了後に起動)
     window.addEventListener('DOMContentLoaded', () => {
       if (window.require) {
-        require.config({
-          'vs/nls': {
-            availableLanguages: {
-              '*': 'ja'
-            }
-          }
-        });
         require(['vs/editor/editor.main'], function () {
           initApp();
         });
