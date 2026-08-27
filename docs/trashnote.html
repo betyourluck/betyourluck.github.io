@@ -1282,11 +1282,11 @@
       ctx.textBaseline = 'top';
       ctx.textAlign = 'center';
 
-      const startCol = Math.max(1, Math.floor(currentScrollLeft / charWidth));
+      const startCol = Math.max(0, Math.floor(currentScrollLeft / charWidth));
       const endCol = Math.min(300, Math.ceil((currentScrollLeft + width + 50) / charWidth));
 
       for (let col = startCol; col <= endCol; col++) {
-        const x = Math.round((col - 1) * charWidth - currentScrollLeft);
+        const x = Math.round(col * charWidth - currentScrollLeft);
 
         if (col % 10 === 0) {
           ctx.fillStyle = markColorMajor;
@@ -1302,7 +1302,9 @@
             ctx.fillStyle = textColorNormal;
             ctx.font = "9px 'SFMono-Regular', Consolas, monospace";
           }
-          ctx.fillText(col.toString(), x, 2);
+          if (col > 0) {
+            ctx.fillText(col.toString(), x, 2);
+          }
         } else if (col % 5 === 0) {
           ctx.fillStyle = markColorMedium;
           ctx.fillRect(x, height - 6, 1, 6);
