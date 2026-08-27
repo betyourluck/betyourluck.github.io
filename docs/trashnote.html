@@ -1542,6 +1542,9 @@
         rulers: isRulerVisible ? [80, 120] : []
       });
 
+      // Ctrl+S / Cmd+S の無効化 (自動保存のためブラウザの保存ダイアログを抑止)
+      editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {});
+
       syncRulerGutterOffset();
       requestRulerRender();
 
@@ -1827,6 +1830,9 @@
     });
 
     window.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+      }
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 't' && !e.shiftKey) {
         e.preventDefault();
         createNewTab(true);
