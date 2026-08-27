@@ -876,6 +876,55 @@
       gap: 8px;
     }
 
+    #print-container {
+      display: none;
+    }
+
+    /* =========================================================
+       Print Styles (テキストのみ印刷)
+       ========================================================= */
+    @media print {
+      body {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        height: auto !important;
+        overflow: visible !important;
+      }
+
+      header, .sub-toolbar, .ruler-container, footer, .modal-overlay, .workspace {
+        display: none !important;
+      }
+
+      #print-container {
+        display: block !important;
+        padding: 0;
+        margin: 0;
+        font-family: 'Consolas', 'Courier New', monospace;
+        font-size: 11pt;
+        line-height: 1.5;
+        color: #000000 !important;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      #print-container.markdown-body {
+        white-space: normal;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        color: #000000 !important;
+      }
+
+      #print-container.markdown-body pre {
+        background-color: #f4f4f5 !important;
+        border: 1px solid #e4e4e7 !important;
+        color: #000000 !important;
+      }
+
+      #print-container.markdown-body code {
+        background-color: #f4f4f5 !important;
+        color: #000000 !important;
+      }
+    }
+
     svg {
       display: inline-block;
       vertical-align: middle;
@@ -1013,6 +1062,24 @@
         </span>
       </button>
 
+      <!-- Font Size Selector -->
+      <div class="ttl-control">
+        <span class="toolbar-label">サイズ:</span>
+        <select class="select-dropdown" id="select-font-size" title="文字サイズ / エディタ・ルーラーのズーム">
+          <option value="11">11px</option>
+          <option value="12">12px</option>
+          <option value="13">13px</option>
+          <option value="14" selected>14px</option>
+          <option value="16">16px</option>
+          <option value="18">18px</option>
+          <option value="20">20px</option>
+          <option value="22">22px</option>
+          <option value="24">24px</option>
+          <option value="28">28px</option>
+          <option value="32">32px</option>
+        </select>
+      </div>
+
       <!-- Language Selector -->
       <div class="ttl-control">
         <span class="toolbar-label">言語:</span>
@@ -1107,6 +1174,9 @@
       </div>
     </div>
   </div>
+
+  <!-- Print Only Container (印刷時に本文テキストのみを出力) -->
+  <div id="print-container"></div>
 
   <!-- Application Logic -->
   <script>
@@ -1215,6 +1285,28 @@
     let previewMode = 'off';
     let isRulerVisible = localStorage.getItem('trashnote_ruler') !== 'false';
     let currentTheme = localStorage.getItem('trashnote_theme') || 'dark';
+    let currentFontSize = parseInt(localStorage.getItem('trashnote_fontsize')) || 14;
+
+    function setFontSize(size) {
+      currentFontSize = size;
+      localStorage.setItem('trashnote_fontsize', size.toString());
+      const selectEl = document.getElementById('select-font-size');
+      if (selectEl && selectEl.value !== size.toString()) {
+        selectEl.value = size.toString();
+      }
+      if (editor) {
+        editor.updateOptions({
+          fontSize: size,
+          lineHeight: Math.round(size * 1.57)
+        });
+        setTimeout(() => {
+          syncRulerGutterOffset();
+          requestRulerRender();
+          const pos = editor.getPosition();
+          if (pos) updateRulerCursorGPU(pos.column);
+        }, 50);
+      }
+    }
 
     // SVG Icons
     const ICONS = {
@@ -1491,6 +1583,11 @@
         return true;
       }).sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
+      const fontSizeSelect = document.getElementById('select-font-size');
+      if (fontSizeSelect) {
+        fontSizeSelect.value = currentFontSize.toString();
+      }
+
       if (tabs.length === 0) {
         createNewTab(false);
       } else {
@@ -1545,8 +1642,9 @@
         automaticLayout: true,
         wordWrap: 'on',
         minimap: { enabled: false },
-        fontSize: 14,
-        lineHeight: 22,
+        fontSize: currentFontSize,
+        lineHeight: Math.round(currentFontSize * 1.57),
+        mouseWheelZoom: true,
         fontFamily: "'Fira Code', 'Cascadia Code', Consolas, 'SFMono-Regular', Menlo, monospace",
         fontLigatures: true,
         padding: { top: 12, bottom: 16 },
@@ -1562,6 +1660,25 @@
 
       syncRulerGutterOffset();
       requestRulerRender();
+
+      // フォントサイズ変更（Ctrl+ホイール等）の検知とルーラー同期
+      editor.onDidChangeConfiguration((e) => {
+        if (e.hasChanged(monaco.editor.EditorOption.fontSize)) {
+          const newSize = editor.getOption(monaco.editor.EditorOption.fontSize);
+          if (newSize && newSize !== currentFontSize) {
+            currentFontSize = newSize;
+            localStorage.setItem('trashnote_fontsize', newSize.toString());
+            const selectEl = document.getElementById('select-font-size');
+            if (selectEl) selectEl.value = newSize.toString();
+            setTimeout(() => {
+              syncRulerGutterOffset();
+              requestRulerRender();
+              const pos = editor.getPosition();
+              if (pos) updateRulerCursorGPU(pos.column);
+            }, 50);
+          }
+        }
+      });
 
       editor.onDidLayoutChange(() => {
         syncRulerGutterOffset();
@@ -1840,6 +1957,10 @@
       setRulerVisibility(!isRulerVisible);
     });
 
+    document.getElementById('select-font-size').addEventListener('change', (e) => {
+      setFontSize(parseInt(e.target.value));
+    });
+
     document.getElementById('select-language').addEventListener('change', (e) => {
       const lang = e.target.value;
       const tab = tabs.find(t => t.id === currentTabId);
@@ -1918,6 +2039,24 @@
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'w') {
         e.preventDefault();
         if (currentTabId) closeTab(currentTabId);
+      }
+    });
+
+    // --- 印刷イベント (本文テキストのみを印刷用コンテナに流し込む) ---
+    window.addEventListener('beforeprint', () => {
+      const printEl = document.getElementById('print-container');
+      if (!printEl || !editor) return;
+      const val = editor.getValue();
+      if (previewMode === 'split' && window.marked) {
+        printEl.className = 'markdown-body';
+        try {
+          printEl.innerHTML = marked.parse(val);
+        } catch (e) {
+          printEl.innerText = val;
+        }
+      } else {
+        printEl.className = '';
+        printEl.innerText = val;
       }
     });
 
