@@ -264,6 +264,20 @@
       border-color: var(--border-color);
     }
 
+    .tab.dragging {
+      opacity: 0.35;
+      background-color: var(--bg-hover);
+      border: 1px dashed var(--accent-primary) !important;
+    }
+
+    .tab.drag-over-left {
+      border-left: 2px solid var(--accent-primary) !important;
+    }
+
+    .tab.drag-over-right {
+      border-right: 2px solid var(--accent-primary) !important;
+    }
+
     .tab-title {
       overflow: hidden;
       text-overflow: ellipsis;
@@ -1475,7 +1489,7 @@
         }
         tab.expires_at = expires;
         return true;
-      });
+      }).sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
       if (tabs.length === 0) {
         createNewTab(false);
@@ -1500,7 +1514,8 @@
         language: 'markdown',
         created_at: now,
         duration_ms: duration,
-        expires_at: now + duration
+        expires_at: now + duration,
+        order: tabs.length
       };
 
       tabs.push(newTab);
@@ -1637,14 +1652,77 @@
       } catch (err) {}
     }
 
+    let draggedTabIndex = null;
+
+    async function syncTabsOrderToDB() {
+      for (let i = 0; i < tabs.length; i++) {
+        tabs[i].order = i;
+        await saveTabToDB(tabs[i]);
+      }
+    }
+
     function renderTabs() {
       const container = document.getElementById('tab-list');
       container.innerHTML = '';
 
-      tabs.forEach(tab => {
+      tabs.forEach((tab, index) => {
         const tabEl = document.createElement('div');
         tabEl.className = `tab ${tab.id === currentTabId ? 'active' : ''}`;
+        tabEl.setAttribute('draggable', 'true');
         tabEl.onclick = () => switchTab(tab.id);
+
+        // ドラッグ開始
+        tabEl.addEventListener('dragstart', (e) => {
+          draggedTabIndex = index;
+          e.dataTransfer.setData('text/plain', tab.id);
+          e.dataTransfer.effectAllowed = 'move';
+          setTimeout(() => tabEl.classList.add('dragging'), 0);
+        });
+
+        // ドラッグ中（挿入位置の視覚インジケーター表示）
+        tabEl.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+          const rect = tabEl.getBoundingClientRect();
+          const midX = rect.left + rect.width / 2;
+          tabEl.classList.remove('drag-over-left', 'drag-over-right');
+          if (e.clientX < midX) {
+            tabEl.classList.add('drag-over-left');
+          } else {
+            tabEl.classList.add('drag-over-right');
+          }
+        });
+
+        tabEl.addEventListener('dragleave', () => {
+          tabEl.classList.remove('drag-over-left', 'drag-over-right');
+        });
+
+        // ドロップ時：配列を並び替えて再描画
+        tabEl.addEventListener('drop', (e) => {
+          e.preventDefault();
+          tabEl.classList.remove('drag-over-left', 'drag-over-right');
+          if (draggedTabIndex === null) return;
+
+          const rect = tabEl.getBoundingClientRect();
+          const midX = rect.left + rect.width / 2;
+          let targetIndex = index;
+          if (e.clientX >= midX) targetIndex++;
+          if (draggedTabIndex < targetIndex) targetIndex--;
+
+          if (draggedTabIndex !== targetIndex) {
+            const [movedTab] = tabs.splice(draggedTabIndex, 1);
+            tabs.splice(targetIndex, 0, movedTab);
+            syncTabsOrderToDB();
+            renderTabs();
+          }
+        });
+
+        tabEl.addEventListener('dragend', () => {
+          draggedTabIndex = null;
+          document.querySelectorAll('.tab').forEach(el => {
+            el.classList.remove('dragging', 'drag-over-left', 'drag-over-right');
+          });
+        });
 
         const titleSpan = document.createElement('span');
         titleSpan.className = 'tab-title';
