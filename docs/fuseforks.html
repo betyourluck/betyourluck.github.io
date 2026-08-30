@@ -1133,8 +1133,8 @@
 
     .install-methods {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 16px;
+      grid-template-columns: 1fr;
+      gap: 12px;
       margin-bottom: 32px;
       text-align: left;
     }
@@ -1181,8 +1181,69 @@
       white-space: nowrap;
     }
 
-    .install-cmd + .install-cmd {
+    .install-cmd + .install-cmd,
+    .install-cmd-row + .install-cmd-row {
       margin-top: 8px;
+    }
+
+    /* コピーボタン付きコマンド行（コマンド枠の内側に薄く重ねる） */
+    .install-cmd-row {
+      position: relative;
+      display: block;
+    }
+
+    .install-cmd-row .install-cmd {
+      display: block;
+      margin: 0;
+      padding-right: 56px;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 50%;
+      right: 8px;
+      transform: translateY(-50%);
+      appearance: none;
+      -webkit-appearance: none;
+      background: none;
+      border: 0;
+      border-radius: 3px;
+      padding: 0 2px;
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      line-height: 1;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+      color: var(--text-primary, #e6edf3);
+      opacity: 0.28;
+      cursor: pointer;
+      transition: opacity 0.15s ease, color 0.15s ease;
+    }
+
+    .install-cmd-row:hover .copy-btn {
+      opacity: 0.62;
+    }
+
+    .copy-btn:hover {
+      opacity: 1;
+    }
+
+    .copy-btn:focus-visible {
+      opacity: 1;
+      outline: 1px solid var(--accent-cyan);
+      outline-offset: 3px;
+    }
+
+    .copy-btn.copied {
+      opacity: 1;
+      color: var(--accent-emerald, #10b981);
+    }
+
+    /* ヒーローのアプリ画面キャプチャ */
+    .app-screenshot {
+      display: block;
+      width: 100%;
+      height: auto;
     }
 
     .install-note {
@@ -1490,143 +1551,9 @@
           MPL-2.0 オープンソース • Windows / macOS (Apple Silicon) / Linux • アカウント登録不要
         </p>
 
-        <!-- 3-Pane Village Desktop UI Mockup -->
-        <div class="mockup-container reveal-scale delay-400" aria-label="Fuseforks 3ペイン画面プレビュー">
-          <div class="mockup-header">
-            <div class="mockup-dots">
-              <span class="mockup-dot dot-red"></span>
-              <span class="mockup-dot dot-yellow"></span>
-              <span class="mockup-dot dot-green"></span>
-            </div>
-            <div class="mockup-title">Fuseforks — Village: "Research & Build Pipeline"</div>
-            <div class="mockup-actions">
-              <span class="mockup-tag">Tokio + Rayon Core (Active)</span>
-            </div>
-          </div>
-
-          <div class="mockup-3pane-grid">
-            <!-- Left Pane: Servants List & Public Square -->
-            <div class="pane-left">
-              <div class="pane-section-title">
-                <span>村人一覧 (Servants)</span>
-                <span>4</span>
-              </div>
-              <div class="servant-item active">
-                <div class="servant-avatar" style="background: #3b82f6;">👑</div>
-                <div>
-                  <div style="font-weight: 600;">Coordinator</div>
-                  <div style="font-size: 0.7rem; color: var(--text-muted);">Claude 3.7 Sonnet</div>
-                </div>
-                <span class="servant-role-badge">Lead</span>
-              </div>
-              <div class="servant-item">
-                <div class="servant-avatar" style="background: #10b981;">🔍</div>
-                <div>
-                  <div style="font-weight: 600;">Researcher</div>
-                  <div style="font-size: 0.7rem; color: var(--text-muted);">Gemini 2.5 Flash</div>
-                </div>
-                <span class="servant-role-badge">Search</span>
-              </div>
-              <div class="servant-item">
-                <div class="servant-avatar" style="background: #8b5cf6;">💻</div>
-                <div>
-                  <div style="font-weight: 600;">Coder</div>
-                  <div style="font-size: 0.7rem; color: var(--text-muted);">Local DeepSeek</div>
-                </div>
-                <span class="servant-role-badge">Worker</span>
-              </div>
-
-              <div class="pane-section-title" style="margin-top: 12px;">広場ログ (Public Square)</div>
-              <div class="public-square-mini">
-                <span style="color: var(--accent-cyan);">[17:02:11]</span> <strong>Researcher</strong>: Grounding facts verified (3 sources).<br>
-                <span style="color: var(--accent-emerald);">[17:02:14]</span> <strong>Coder</strong>: diff applied to src/main.rs.
-              </div>
-            </div>
-
-            <!-- Center Pane: Kizuna Graph & Conversation/Thinking -->
-            <div class="pane-center">
-              <!-- Top: Kizuna (絆) Map -->
-              <div class="kizuna-container">
-                <span class="kizuna-label">Kizuna (絆) Control Panel</span>
-                <svg class="kizuna-svg" viewBox="0 0 500 180">
-                  <!-- Kizuna Links -->
-                  <line x1="120" y1="90" x2="250" y2="45" stroke="rgba(59, 130, 246, 0.5)" stroke-width="2" stroke-dasharray="4 2" />
-                  <line x1="120" y1="90" x2="250" y2="135" stroke="rgba(16, 185, 129, 0.5)" stroke-width="2" />
-                  <line x1="250" y1="45" x2="380" y2="90" stroke="rgba(139, 92, 246, 0.5)" stroke-width="2" />
-                  <line x1="250" y1="135" x2="380" y2="90" stroke="rgba(6, 182, 212, 0.5)" stroke-width="2" />
-
-                  <!-- Node 1: User / Coordinator -->
-                  <g class="kizuna-node" transform="translate(120, 90)">
-                    <circle r="22" fill="#1e293b" stroke="#3b82f6" stroke-width="2" />
-                    <text text-anchor="middle" dy="5" fill="#fff" font-size="12">👑 Coord</text>
-                  </g>
-                  <!-- Node 2: Researcher -->
-                  <g class="kizuna-node" transform="translate(250, 45)">
-                    <circle r="20" fill="#1e293b" stroke="#10b981" stroke-width="2" />
-                    <text text-anchor="middle" dy="4" fill="#fff" font-size="11">🔍 Search</text>
-                  </g>
-                  <!-- Node 3: Coder -->
-                  <g class="kizuna-node" transform="translate(250, 135)">
-                    <circle r="20" fill="#1e293b" stroke="#8b5cf6" stroke-width="2" />
-                    <text text-anchor="middle" dy="4" fill="#fff" font-size="11">💻 Coder</text>
-                  </g>
-                  <!-- Node 4: Verifier -->
-                  <g class="kizuna-node" transform="translate(380, 90)">
-                    <circle r="20" fill="#1e293b" stroke="#06b6d4" stroke-width="2" />
-                    <text text-anchor="middle" dy="4" fill="#fff" font-size="11">🛡️ Verify</text>
-                  </g>
-                </svg>
-              </div>
-
-              <!-- Bottom: Conversation Timeline & Thinking Summary -->
-              <div class="chat-timeline">
-                <div class="chat-msg">
-                  <div class="chat-msg-header">
-                    <span>👑 Coordinator &bull; plan 分散実行</span>
-                    <span>17:02:10</span>
-                  </div>
-                  <!-- Thinking Summary Box -->
-                  <div class="thinking-frame">
-                    🧠 <strong>Thinking summary (思考サマリー)</strong>: タスクをWeb調査とコード修正に並列分割。循環委任チェック通過。
-                  </div>
-                  <!-- Tool Reasons Badge -->
-                  <div class="tool-reason-badge">
-                    🪧 <strong>Tool Reason</strong>: `diff` ツールで変更差分を検証するために呼び出し
-                  </div>
-                  <div>
-                    ResearcherとCoderへ並列タスクを発行しました。結果を束ねて要約します。
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Right Pane: Village Ordinance & Stats -->
-            <div class="pane-right">
-              <div class="pane-section-title">村の掟 (Ordinance)</div>
-              <div class="ordinance-card">
-                # Common Ordinance<br>
-                - 回答は簡潔に結論から<br>
-                - 外部ツールは作業フォルダ内のみ<br>
-                - 事実と推測を厳格に分離
-              </div>
-
-              <div class="pane-section-title" style="margin-top: 8px;">統計 (Stats & Cost)</div>
-              <div class="stats-card">
-                <div class="stat-row">
-                  <span style="color: var(--text-muted);">Tokens (Total)</span>
-                  <span class="stat-val">14,820 tk</span>
-                </div>
-                <div class="stat-row">
-                  <span style="color: var(--text-muted);">Est. Cost</span>
-                  <span class="stat-val" style="color: var(--accent-emerald);">≈ $0.014</span>
-                </div>
-                <div class="stat-row">
-                  <span style="color: var(--text-muted);">Closing Period</span>
-                  <span class="stat-val">月末締め (8/31)</span>
-                </div>
-              </div>
-            </div>
-          </div>
+        <!-- アプリのスクリーンショット -->
+        <div class="mockup-container reveal-scale delay-400">
+          <img src="images/fuseforks_sample.webp" alt="Fuseforks の3ペイン画面（村人一覧・対話ログ・村の掟と統計）" class="app-screenshot" loading="lazy" decoding="async">
         </div>
       </div>
     </section>
@@ -2008,7 +1935,10 @@
                 <span class="install-os">macOS</span>
                 <span class="install-tag">Homebrew</span>
               </div>
-              <code class="install-cmd">brew install --cask betyourluck/tap/fuseforks</code>
+              <div class="install-cmd-row">
+                <code class="install-cmd">brew install --cask betyourluck/tap/fuseforks</code>
+                <button type="button" class="copy-btn" data-copy="brew install --cask betyourluck/tap/fuseforks" aria-label="brew install コマンドをコピー">copy</button>
+              </div>
               <p class="install-note">
                 完全修飾名で指定してください（非公式 tap は短い名前では拒否されます）。
                 Apple Silicon 専用・署名と公証済みです。
@@ -2021,8 +1951,14 @@
                 <span class="install-os">Windows</span>
                 <span class="install-tag">winget</span>
               </div>
-              <code class="install-cmd">winget install --id Outcasts.Fuseforks</code>
-              <code class="install-cmd">winget upgrade --id Outcasts.Fuseforks</code>
+              <div class="install-cmd-row">
+                <code class="install-cmd">winget install --id Outcasts.Fuseforks</code>
+                <button type="button" class="copy-btn" data-copy="winget install --id Outcasts.Fuseforks" aria-label="winget install コマンドをコピー">copy</button>
+              </div>
+              <div class="install-cmd-row">
+                <code class="install-cmd">winget upgrade --id Outcasts.Fuseforks</code>
+                <button type="button" class="copy-btn" data-copy="winget upgrade --id Outcasts.Fuseforks" aria-label="winget upgrade コマンドをコピー">copy</button>
+              </div>
               <p class="install-note">
                 公式リポジトリに登録済みです。更新も同じ経路で
                 <code>winget upgrade</code> から受け取れます。
@@ -2241,7 +2177,51 @@
 
       // 6. FAQアコーディオン制御
       initFaqAccordion();
+
+      // 7. インストールコマンドのコピーボタン
+      initCopyButtons();
     });
+
+    /**
+     * data-copy を持つボタンで、対応するコマンド文字列をクリップボードへ複製する。
+     * Clipboard API が使えない環境（非セキュアコンテキスト等）では
+     * 一時 textarea + execCommand へフォールバックする。
+     */
+    function initCopyButtons() {
+      const buttons = document.querySelectorAll('.copy-btn[data-copy]');
+      buttons.forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const text = btn.dataset.copy;
+          let ok = false;
+          try {
+            if (navigator.clipboard && window.isSecureContext) {
+              await navigator.clipboard.writeText(text);
+              ok = true;
+            } else {
+              const ta = document.createElement('textarea');
+              ta.value = text;
+              ta.setAttribute('readonly', '');
+              ta.style.position = 'fixed';
+              ta.style.opacity = '0';
+              document.body.appendChild(ta);
+              ta.select();
+              ok = document.execCommand('copy');
+              document.body.removeChild(ta);
+            }
+          } catch (e) {
+            ok = false;
+          }
+
+          const original = btn.dataset.label || (btn.dataset.label = btn.textContent);
+          btn.textContent = ok ? 'copied' : 'failed';
+          btn.classList.toggle('copied', ok);
+          window.setTimeout(() => {
+            btn.textContent = original;
+            btn.classList.remove('copied');
+          }, 1600);
+        });
+      });
+    }
 
     /**
      * ユーザーのOSを判別してCTA文言とリンクを最適化
