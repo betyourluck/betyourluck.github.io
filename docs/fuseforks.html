@@ -1,11 +1,32 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" data-lang="ja">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Outcasts Fuseforks - AIエージェントの「村」を手元に。複数のAIが自律的に協調・委任・自走するデスクトップオーケストレーションツール。Rust + Tauri v2 + Vue 3。">
   <meta name="theme-color" content="#0a0b10">
   <title>Outcasts Fuseforks — Keep a village of AI agents in your hands.</title>
+
+  <script>
+    (function() {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlLang = urlParams.get('lang');
+        const savedLang = localStorage.getItem('fuseforks_lang');
+        const browserLang = (navigator.languages && navigator.languages[0]) || navigator.language || '';
+        let lang = 'ja';
+        if (urlLang === 'en' || urlLang === 'ja') {
+          lang = urlLang;
+        } else if (savedLang === 'en' || savedLang === 'ja') {
+          lang = savedLang;
+        } else if (!browserLang.toLowerCase().startsWith('ja')) {
+          lang = 'en';
+        }
+        document.documentElement.setAttribute('data-lang', lang);
+        document.documentElement.setAttribute('lang', lang);
+      } catch (e) {}
+    })();
+  </script>
 
   <!-- Google Fonts & System Font Stack -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1460,6 +1481,52 @@
         font-size: 2.2rem;
       }
     }
+
+    /* ==========================================================================
+       Language Switcher & Bilingual Display Controls
+       ========================================================================== */
+    html[data-lang="ja"] .lang-en {
+      display: none !important;
+    }
+    html[data-lang="en"] .lang-ja {
+      display: none !important;
+    }
+
+    .lang-switcher {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-full);
+      padding: 2px;
+      gap: 2px;
+    }
+    .lang-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      font-weight: 600;
+      padding: 4px 9px;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      transition: all var(--transition-base);
+      line-height: 1;
+    }
+    .lang-btn:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.04);
+    }
+    html[data-lang="ja"] .lang-btn[data-lang-set="ja"],
+    html[data-lang="en"] .lang-btn[data-lang-set="en"] {
+      background: var(--bg-surface-3);
+      color: var(--text-primary);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    }
   </style>
 </head>
 <body class="no-js">
@@ -1469,7 +1536,7 @@
        ========================================================================== -->
   <header class="site-header" id="siteHeader">
     <div class="container header-inner">
-      <a href="#" class="logo" aria-label="Outcasts Fuseforks ホーム">
+      <a href="#" class="logo" aria-label="Outcasts Fuseforks">
         <div class="logo-icon">
           <!-- アプリのタイトルバー（TitleBar.vue）のブランドマークを逐語で写した。
                3 つのノードが繋がる図＝オーケストレーションの形そのもの。 -->
@@ -1486,22 +1553,49 @@
 
       <nav aria-label="メインナビゲーション">
         <ul class="nav-links">
-          <li><a href="#features" class="nav-link">特徴</a></li>
-          <li><a href="#philosophy" class="nav-link">設計思想</a></li>
-          <li><a href="#capabilities" class="nav-link">全機能一覧</a></li>
-          <li><a href="#tech-stack" class="nav-link">技術構成</a></li>
+          <li>
+            <a href="#features" class="nav-link">
+              <span class="lang-ja">特徴</span>
+              <span class="lang-en">Features</span>
+            </a>
+          </li>
+          <li>
+            <a href="#philosophy" class="nav-link">
+              <span class="lang-ja">設計思想</span>
+              <span class="lang-en">Philosophy</span>
+            </a>
+          </li>
+          <li>
+            <a href="#capabilities" class="nav-link">
+              <span class="lang-ja">全機能一覧</span>
+              <span class="lang-en">Capabilities</span>
+            </a>
+          </li>
+          <li>
+            <a href="#tech-stack" class="nav-link">
+              <span class="lang-ja">技術構成</span>
+              <span class="lang-en">Architecture</span>
+            </a>
+          </li>
           <li><a href="#faq" class="nav-link">FAQ</a></li>
         </ul>
       </nav>
 
       <div class="header-actions">
+        <div class="lang-switcher" role="group" aria-label="Language Selector">
+          <button type="button" class="lang-btn" data-lang-set="ja" aria-label="日本語に切り替え">JA</button>
+          <button type="button" class="lang-btn" data-lang-set="en" aria-label="Switch to English">EN</button>
+        </div>
         <a href="https://github.com/betyourluck/Fuseforks" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" aria-label="GitHubリポジトリ">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
           </svg>
           GitHub
         </a>
-        <a href="#download" class="btn btn-primary">ダウンロード</a>
+        <a href="#download" class="btn btn-primary">
+          <span class="lang-ja">ダウンロード</span>
+          <span class="lang-en">Download</span>
+        </a>
       </div>
     </div>
   </header>
@@ -1515,7 +1609,8 @@
         <div class="hero-badges-row reveal">
           <div class="hero-badge">
             <span class="badge-dot"></span>
-            <span>Outcasts Fuseforks 公開中</span>
+            <span class="lang-ja">Outcasts Fuseforks 公開中</span>
+            <span class="lang-en">Outcasts Fuseforks is Live</span>
           </div>
           <span class="tech-pill">Rust 2024</span>
           <span class="tech-pill">Tauri v2</span>
@@ -1523,14 +1618,22 @@
           <span class="tech-pill">MPL-2.0</span>
         </div>
 
-        <h1 class="hero-title reveal delay-100">
+        <h1 class="hero-title reveal delay-100 lang-ja">
           AIエージェントの“村”を、<br>
           <span class="text-gradient">あなたの手元に。</span>
         </h1>
+        <h1 class="hero-title reveal delay-100 lang-en">
+          Keep a village of AI agents<br>
+          <span class="text-gradient">in your hands.</span>
+        </h1>
 
-        <p class="hero-description reveal delay-200">
+        <p class="hero-description reveal delay-200 lang-ja">
           <strong>Outcasts Fuseforks</strong> は、複数のAIエージェントが協調・対話するマルチエージェントオーケストレーション・デスクトップアプリです。<br>
           エージェントを作成し、結びつけ、対話する——村が動き出し、自律的にタスクを委任・分散・統合して自走します。
+        </p>
+        <p class="hero-description reveal delay-200 lang-en">
+          <strong>Outcasts Fuseforks</strong> is a desktop orchestration app where multiple AI agents collaborate, deliberate, and act.<br>
+          Create agents, connect them, and spark conversations — watch your village come alive, autonomously delegating, distributing, and converging on tasks.
         </p>
 
         <div class="hero-cta-group reveal delay-300">
@@ -1540,20 +1643,23 @@
               <polyline points="7 10 12 15 17 10"></polyline>
               <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
-            <span>インストールする</span>
+            <span class="lang-ja">インストールする</span>
+            <span class="lang-en">Get Started</span>
           </a>
           <a href="https://github.com/betyourluck/Fuseforks" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-lg">
-            ソースコードを見る
+            <span class="lang-ja">ソースコードを見る</span>
+            <span class="lang-en">View Source</span>
           </a>
         </div>
 
         <p class="hero-subtext reveal delay-300">
-          MPL-2.0 オープンソース • Windows / macOS (Apple Silicon) / Linux • アカウント登録不要
+          <span class="lang-ja">MPL-2.0 オープンソース • Windows / macOS (Apple Silicon) / Linux • アカウント登録不要</span>
+          <span class="lang-en">MPL-2.0 Open Source • Windows / macOS (Apple Silicon) / Linux • No Account Required</span>
         </p>
 
         <!-- アプリのスクリーンショット -->
         <div class="mockup-container reveal-scale delay-400">
-          <img src="images/fuseforks_sample.webp" alt="Fuseforks の3ペイン画面（村人一覧・対話ログ・村の掟と統計）" class="app-screenshot" loading="lazy" decoding="async">
+          <img src="images/fuseforks_sample.webp" alt="Fuseforks 3-pane desktop interface" class="app-screenshot" loading="lazy" decoding="async">
         </div>
       </div>
     </section>
@@ -1565,37 +1671,65 @@
       <div class="container">
         <div class="philosophy-grid">
           <div class="reveal">
-            <div class="philosophy-tag">設計思想</div>
-            <h2 class="philosophy-title">「おもちゃの形をした本物」</h2>
-            <p class="philosophy-text">
-              Fuseforksが対象とするのは、<strong>趣味としてAIと向き合うエンジニア</strong>です。<br>
-              企業の業務とは異なり、個人の趣味では「自分の時間」以上に「APIコスト」や「手軽さ」が重要になります。だからこそ、難解なcron構文やYAMLの壁を取り払い、直感的に扱えるシェルを用意しました。
-            </p>
-            <p class="philosophy-text">
-              しかし、<strong>趣味だからこそ、その中身は本物でなければならない</strong>。初期のLinuxがSolarisユーザーからおもちゃ扱いされつつも中身が本物のUnixだったように、Fuseforksは妥協のないRustコアによって支えられています。
-            </p>
+            <div class="philosophy-tag">
+              <span class="lang-ja">設計思想</span>
+              <span class="lang-en">Philosophy</span>
+            </div>
+            <h2 class="philosophy-title lang-ja">「おもちゃの形をした本物」</h2>
+            <h2 class="philosophy-title lang-en">"A Real Thing Wearing the Shape of a Toy"</h2>
+
+            <div class="lang-ja">
+              <p class="philosophy-text">
+                Fuseforksが対象とするのは、<strong>趣味としてAIと向き合うエンジニア</strong>です。<br>
+                企業の業務とは異なり、個人の趣味では「自分の時間」以上に「APIコスト」や「手軽さ」が重要になります。だからこそ、難解なcron構文やYAMLの壁を取り払い、直感的に扱えるシェルを用意しました。
+              </p>
+              <p class="philosophy-text">
+                しかし、<strong>趣味だからこそ、その中身は本物でなければならない</strong>。初期のLinuxがSolarisユーザーからおもちゃ扱いされつつも中身が本物のUnixだったように、Fuseforksは妥協のないRustコアによって支えられています。
+              </p>
+            </div>
+            <div class="lang-en">
+              <p class="philosophy-text">
+                Fuseforks is crafted for <strong>engineers who explore AI as a craft and hobby</strong>.<br>
+                Unlike corporate enterprise workflows, personal hacking demands respect for both your time and your API budget. That is why we stripped away convoluted cron syntax and wall-of-YAML configurations, providing an intuitive, delightful shell.
+              </p>
+              <p class="philosophy-text">
+                Yet <strong>because it is a craft, what lies beneath must be uncompromisingly real</strong>. Just as early Linux was dismissed as a toy by Solaris veterans while possessing the soul of a true Unix, Fuseforks is powered by a rock-solid, production-grade Rust core.
+              </p>
+            </div>
           </div>
 
           <div class="two-layer-cards reveal delay-100">
             <!-- Core Layer -->
             <div class="layer-card">
               <div class="layer-head">
-                <h3 class="layer-title">コア層 (`fuseforks-core`)</h3>
+                <h3 class="layer-title">
+                  <span class="lang-ja">コア層 (`fuseforks-core`)</span>
+                  <span class="lang-en">Core Layer (`fuseforks-core`)</span>
+                </h3>
                 <span class="layer-badge badge-core">Production Quality</span>
               </div>
-              <p class="layer-desc">
+              <p class="layer-desc lang-ja">
                 Rust 2024 + Tokio / Rayon。厳格なデータ規約（`data_contract.yaml`）、redbによる高速永続化、OS標準Keyringによる鍵管理。<strong>GUI完全非依存で、単体でヘッドレス動作が保証</strong>されています。
+              </p>
+              <p class="layer-desc lang-en">
+                Rust 2024 + Tokio / Rayon. Strict data contracts (<code>data_contract.yaml</code>), embedded ACID persistence via <code>redb</code>, and OS Keyring credential management. <strong>100% headless-capable with zero GUI dependency</strong>.
               </p>
             </div>
 
             <!-- Shell Layer -->
             <div class="layer-card">
               <div class="layer-head">
-                <h3 class="layer-title">シェル層 (Village & 3 Panes)</h3>
+                <h3 class="layer-title">
+                  <span class="lang-ja">シェル層 (Village &amp; 3 Panes)</span>
+                  <span class="lang-en">Shell Layer (Village &amp; 3 Panes)</span>
+                </h3>
                 <span class="layer-badge badge-shell">Hobby Experience</span>
               </div>
-              <p class="layer-desc">
+              <p class="layer-desc lang-ja">
                 Tauri v2 + Vue 3 + Bun + Tailwind CSS v4。1画面3ペインで村の全体像（Kizuna）を直感把握。可愛らしさのために規約を緩めず、業務風に見せるための無駄な設定を排除しています。
+              </p>
+              <p class="layer-desc lang-en">
+                Tauri v2 + Vue 3 + Bun + Tailwind CSS v4. A single-window 3-pane layout for intuitive grasp of your entire village topology (Kizuna). No compromise on safety for aesthetics, and no enterprise bloat.
               </p>
             </div>
           </div>
@@ -1609,20 +1743,29 @@
     <section class="feature-section" id="features">
       <div class="container">
         <div class="section-head reveal">
-          <div class="section-tag">コア機能</div>
-          <h2 class="section-title">自律と統制が両立する<br>マルチエージェント体験</h2>
-          <p class="section-subtitle">単なるチャットボットの集まりではない。本当の意味での協調オーケストレーション。</p>
+          <div class="section-tag">
+            <span class="lang-ja">コア機能</span>
+            <span class="lang-en">Core Features</span>
+          </div>
+          <h2 class="section-title lang-ja">自律と統制が両立する<br>マルチエージェント体験</h2>
+          <h2 class="section-title lang-en">Autonomous yet Governed:<br>True Multi-Agent Orchestration</h2>
+          <p class="section-subtitle lang-ja">単なるチャットボットの集まりではない。本当の意味での協調オーケストレーション。</p>
+          <p class="section-subtitle lang-en">Far beyond a collection of chat bots. Coordinated multi-agent collaboration with genuine structure.</p>
         </div>
 
         <!-- Feature 1: 委任と収束 -->
         <div class="feature-row">
           <div class="feature-content reveal">
-            <div class="feature-badge">Delegation & Convergence</div>
-            <h3 class="feature-heading">`ask` と `plan` による<br>整然としたタスク委任と収束</h3>
-            <p class="feature-text">
+            <div class="feature-badge">Delegation &amp; Convergence</div>
+            <h3 class="feature-heading lang-ja">`ask` と `plan` による<br>整然としたタスク委任と収束</h3>
+            <h3 class="feature-heading lang-en">Orderly Task Delegation &amp; Convergence<br>Powered by `ask` and `plan`</h3>
+            <p class="feature-text lang-ja">
               司令塔エージェント（Coordinator）が `ask` で問いかけ、`plan` で複数のワーカーへ並列にタスクを分散。完了した結果を綺麗に束ねて回答します。
             </p>
-            <ul class="feature-list">
+            <p class="feature-text lang-en">
+              A Coordinator agent delegates questions via <code>ask</code> and fans out parallel subtasks across workers using <code>plan</code> — seamlessly synthesizing the converged results into a unified answer.
+            </p>
+            <ul class="feature-list lang-ja">
               <li class="feature-list-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 <span><strong>循環委任の即時検知</strong>: A→B→Aのような無限ループを待たずに即座に拒絶</span>
@@ -1632,19 +1775,32 @@
                 <span><strong>プラン事前レビュー</strong>: ワーカーへ展開される前に人間が計画を編集・承認可能</span>
               </li>
             </ul>
+            <ul class="feature-list lang-en">
+              <li class="feature-list-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span><strong>Instant Circular Delegation Detection</strong>: Halts infinite loops (A&rarr;B&rarr;A) immediately without consuming redundant tokens</span>
+              </li>
+              <li class="feature-list-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span><strong>Plan Pre-Review</strong>: Inspect, edit, and approve multi-step execution plans before workers are dispatched</span>
+              </li>
+            </ul>
           </div>
           <div class="feature-visual reveal delay-100">
             <div class="grounding-card">
               <div class="grounding-row" style="border-left: 3px solid var(--accent-blue);">
-                <span>👑 Coordinator &rarr; <code>plan</code> 発行</span>
+                <span class="lang-ja">👑 Coordinator &rarr; <code>plan</code> 発行</span>
+                <span class="lang-en">👑 Coordinator &rarr; Issue <code>plan</code></span>
                 <span style="color: var(--accent-cyan); font-family: var(--font-mono);">Parallel x3</span>
               </div>
               <div class="grounding-row" style="border-left: 3px solid var(--accent-emerald);">
-                <span>🔍 Worker A: ドキュメント検索</span>
+                <span class="lang-ja">🔍 Worker A: ドキュメント検索</span>
+                <span class="lang-en">🔍 Worker A: Search documentation</span>
                 <span style="color: var(--accent-emerald); font-family: var(--font-mono);">Done (0.4s)</span>
               </div>
               <div class="grounding-row" style="border-left: 3px solid var(--accent-purple);">
-                <span>💻 Worker B: 単体テスト実行</span>
+                <span class="lang-ja">💻 Worker B: 単体テスト実行</span>
+                <span class="lang-en">💻 Worker B: Run test suite</span>
                 <span style="color: var(--accent-purple); font-family: var(--font-mono);">Done (1.1s)</span>
               </div>
             </div>
@@ -1654,12 +1810,16 @@
         <!-- Feature 2: 自然言語スケジュール & ゼロトークン事前チェック -->
         <div class="feature-row reverse">
           <div class="feature-content reveal">
-            <div class="feature-badge">Smart Scheduling & Pre-check</div>
-            <h3 class="feature-heading">自然言語スケジュール &amp;<br>トークン無駄撃ちゼロの事前チェック</h3>
-            <p class="feature-text">
+            <div class="feature-badge">Smart Scheduling &amp; Pre-check</div>
+            <h3 class="feature-heading lang-ja">自然言語スケジュール &amp;<br>トークン無駄撃ちゼロの事前チェック</h3>
+            <h3 class="feature-heading lang-en">Natural Language Scheduling &amp;<br>Zero-Token Pre-Check Verification</h3>
+            <p class="feature-text lang-ja">
               「毎週木曜の17:00」「10分ごと」といった平易な言葉でトリガーを設定可能（cron構文不要）。さらに、発火時にローカルコマンドを実行し、<strong>出力がシグナルと一致した時だけLLMを呼ぶ</strong>事前チェックを搭載。
             </p>
-            <ul class="feature-list">
+            <p class="feature-text lang-en">
+              Define triggers in plain English like "Every Thursday at 5 PM" or "Every 10 minutes" (no cron deciphering required). Pair triggers with local check commands that <strong>invoke the LLM only when shell outputs match your expected signal</strong>.
+            </p>
+            <ul class="feature-list lang-ja">
               <li class="feature-list-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 <span><strong>空振り発火のトークン消費は完全ゼロ</strong>（個人の財布に優しい設計）</span>
@@ -1667,6 +1827,16 @@
               <li class="feature-list-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 <span>共有村で届いたコマンドは承認するまで実行されない安全設計</span>
+              </li>
+            </ul>
+            <ul class="feature-list lang-en">
+              <li class="feature-list-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span><strong>Zero LLM Token Cost on False Alarms</strong>: Kind to your personal wallet when nothing needs attention</span>
+              </li>
+              <li class="feature-list-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span><strong>Safe by Design</strong>: Commands arriving from shared villages require explicit human consent before execution</span>
               </li>
             </ul>
           </div>
@@ -1677,7 +1847,8 @@
                 <span style="color: var(--accent-amber);">Signal Watcher</span>
               </div>
               <div>$ git status --porcelain</div>
-              <div style="color: var(--text-muted); margin-top: 4px;"># 出力なし &rarr; シグナル不一致</div>
+              <div class="lang-ja" style="color: var(--text-muted); margin-top: 4px;"># 出力なし &rarr; シグナル不一致</div>
+              <div class="lang-en" style="color: var(--text-muted); margin-top: 4px;"># No output &rarr; Signal mismatch</div>
               <div style="margin-top: 8px; color: var(--accent-emerald); font-weight: 600;">
                 ✓ Skipped (0 tokens consumed / $0.00)
               </div>
@@ -1688,12 +1859,16 @@
         <!-- Feature 3: MCP & 厳格なグラウンディング -->
         <div class="feature-row">
           <div class="feature-content reveal">
-            <div class="feature-badge">MCP & Grounding</div>
-            <h3 class="feature-heading">Claudeの `mcp.json` をそのまま流用。<br>検証可能なグラウンディング</h3>
-            <p class="feature-text">
+            <div class="feature-badge">MCP &amp; Grounding</div>
+            <h3 class="feature-heading lang-ja">Claudeの `mcp.json` をそのまま流用。<br>検証可能なグラウンディング</h3>
+            <h3 class="feature-heading lang-en">Drop-in Claude `mcp.json` Compatibility.<br>Verifiable Evidence Grounding</h3>
+            <p class="feature-text lang-ja">
               Claude Desktopの設定ファイルをそのまま貼り付けるだけで、外部ツール（共有＋エージェント個別）を即座に利用可能。また、Web検索（Gemini / Grok / OpenAI / Meta / Perplexity）時の事実とソースを厳格に切り分けます。
             </p>
-            <ul class="feature-list">
+            <p class="feature-text lang-en">
+              Drop your Claude Desktop configuration straight in to equip shared or agent-specific MCP tools instantly. Separate verified facts from external web search sources (Gemini, Grok, OpenAI, Meta, Perplexity) with complete transparency.
+            </p>
+            <ul class="feature-list lang-ja">
               <li class="feature-list-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 <span><strong>事実・情報源・未発見の分離</strong>: 曖昧な主張と検証可能なポインタを混同しない</span>
@@ -1707,19 +1882,36 @@
                 <span><strong>プロバイダ固有スキル</strong>: Perplexity の金融・人物検索やURL取得など、各社にしかない機能をモデルごとに個別ON</span>
               </li>
             </ul>
+            <ul class="feature-list lang-en">
+              <li class="feature-list-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span><strong>Strict Separation of Facts, Sources &amp; Unfound Info</strong>: Never mistake ambiguous hallucination for verifiable citation pointers</span>
+              </li>
+              <li class="feature-list-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span><strong>Isolated Thought Stream</strong>: Keeps model reasoning traces cleanly folded separate from user-facing answers</span>
+              </li>
+              <li class="feature-list-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span><strong>Provider-Specific Skills</strong>: Toggle specialized capabilities like Perplexity finance / people search or URL fetching per model</span>
+              </li>
+            </ul>
           </div>
           <div class="feature-visual reveal delay-100">
             <div class="grounding-card">
               <div class="grounding-row">
-                <span>🔍 検索された事実 (Fact)</span>
+                <span class="lang-ja">🔍 検索された事実 (Fact)</span>
+                <span class="lang-en">🔍 Retrieved Facts</span>
                 <span style="color: var(--accent-emerald);">Verified</span>
               </div>
               <div class="grounding-row">
-                <span>📌 検証可能な情報源 (Source)</span>
+                <span class="lang-ja">📌 検証可能な情報源 (Source)</span>
+                <span class="lang-en">📌 Verifiable Sources</span>
                 <span style="color: var(--accent-blue);">3 URLs Pointer</span>
               </div>
               <div class="grounding-row">
-                <span>⚠️ 見つからなかった情報 (Unfound)</span>
+                <span class="lang-ja">⚠️ 見つからなかった情報 (Unfound)</span>
+                <span class="lang-en">⚠️ Unfound Information</span>
                 <span style="color: var(--accent-rose);">Explicitly Listed</span>
               </div>
             </div>
@@ -1729,12 +1921,16 @@
         <!-- Feature 4: ビルトインツール & 安全性 -->
         <div class="feature-row reverse">
           <div class="feature-content reveal">
-            <div class="feature-badge">Security & Built-in Tools</div>
-            <h3 class="feature-heading">作業フォルダ外アクセスを構造的に遮断。<br>充実のビルトインツール</h3>
-            <p class="feature-text">
+            <div class="feature-badge">Security &amp; Built-in Tools</div>
+            <h3 class="feature-heading lang-ja">作業フォルダ外アクセスを構造的に遮断。<br>充実のビルトインツール</h3>
+            <h3 class="feature-heading lang-en">Structurally Sandboxed Workspace Access.<br>Batteries-Included Tool Suite</h3>
+            <p class="feature-text lang-ja">
               `remember` / `grep` / `fd` / `diff` / `sd` / `yq` / `file` / `rag` / `run` を標準装備。ファイル操作ツールは構造的に作業フォルダ外を読み書きできないよう保護されています。
             </p>
-            <ul class="feature-list">
+            <p class="feature-text lang-en">
+              Equipped out-of-the-box with <code>remember</code>, <code>grep</code>, <code>fd</code>, <code>diff</code>, <code>sd</code>, <code>yq</code>, <code>file</code>, <code>rag</code>, and <code>run</code>. File system tools are structurally restricted from traversing outside the workspace directory.
+            </p>
+            <ul class="feature-list lang-ja">
               <li class="feature-list-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 <span><strong>ツール使用理由 (Tool Reasons)</strong>: なぜそのツールに手を伸ばしたかが対話内に1行明記</span>
@@ -1742,6 +1938,16 @@
               <li class="feature-list-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 <span><strong>OS Keyringによる暗号化保管</strong>: APIキーは平文設定ファイルに保存されません</span>
+              </li>
+            </ul>
+            <ul class="feature-list lang-en">
+              <li class="feature-list-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span><strong>Explicit Tool Reasons</strong>: Every tool call records a single-line reason in the dialogue explaining why it was chosen</span>
+              </li>
+              <li class="feature-list-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span><strong>Encrypted OS Keyring Storage</strong>: API keys are securely kept in OS-level vaults, never stored in plain-text config files</span>
               </li>
             </ul>
           </div>
@@ -1768,94 +1974,147 @@
     <section class="feature-section" id="capabilities" style="background: rgba(17, 19, 28, 0.3);">
       <div class="container">
         <div class="section-head reveal">
-          <div class="section-tag">機能一覧</div>
-          <h2 class="section-title">エンジニアが求めるすべてを網羅</h2>
-          <p class="section-subtitle">細部まで考え抜かれた洗練されたオーケストレーション機能群。</p>
+          <div class="section-tag">
+            <span class="lang-ja">機能一覧</span>
+            <span class="lang-en">Capabilities</span>
+          </div>
+          <h2 class="section-title lang-ja">エンジニアが求めるすべてを網羅</h2>
+          <h2 class="section-title lang-en">Everything the Modern Hacker Demands</h2>
+          <p class="section-subtitle lang-ja">細部まで考え抜かれた洗練されたオーケストレーション機能群。</p>
+          <p class="section-subtitle lang-en">Thoughtfully crafted orchestration capabilities built for daily engineering.</p>
         </div>
 
         <div class="capabilities-grid">
           <!-- 1 -->
           <div class="capability-card reveal">
             <div class="capability-icon-emoji">🎚️</div>
-            <h3 class="capability-title">ハンドオフ切り替え</h3>
-            <p class="capability-desc">司令塔がユーザーへ会話を丸投げするのを禁止し、必ず回答を持ち帰らせる制御が可能。</p>
+            <h3 class="capability-title">
+              <span class="lang-ja">ハンドオフ切り替え</span>
+              <span class="lang-en">Handoff Policy Control</span>
+            </h3>
+            <p class="capability-desc lang-ja">司令塔がユーザーへ会話を丸投げするのを禁止し、必ず回答を持ち帰らせる制御が可能。</p>
+            <p class="capability-desc lang-en">Prevent coordinators from dumping unfinished threads back onto the user — enforce bringing back converged results.</p>
           </div>
 
           <!-- 2 -->
           <div class="capability-card reveal delay-100">
             <div class="capability-icon-emoji">🗣️</div>
-            <h3 class="capability-title">広場ログ (Public Square)</h3>
-            <p class="capability-desc">村の他のエージェント同士の会話が聞こえる広場。コスト設定として聞かない自由も選択可能。</p>
+            <h3 class="capability-title">
+              <span class="lang-ja">広場ログ (Public Square)</span>
+              <span class="lang-en">Public Square Stream</span>
+            </h3>
+            <p class="capability-desc lang-ja">村の他のエージェント同士の会話が聞こえる広場。コスト設定として聞かない自由も選択可能。</p>
+            <p class="capability-desc lang-en">An ambient square where agents overhear inter-agent chatter, with full toggle freedom to save tokens.</p>
           </div>
 
           <!-- 3 -->
           <div class="capability-card reveal delay-200">
             <div class="capability-icon-emoji">📎</div>
-            <h3 class="capability-title">パス補完 (`@` 補完)</h3>
-            <p class="capability-desc">`@` 入力で作業フォルダ内のファイルを瞬時に選択。エージェントがファイル探索に費やすターンを削減。</p>
+            <h3 class="capability-title">
+              <span class="lang-ja">パス補完 (`@` 補完)</span>
+              <span class="lang-en">Path Auto-Complete (`@` Completion)</span>
+            </h3>
+            <p class="capability-desc lang-ja">`@` 入力で作業フォルダ内のファイルを瞬時に選択。エージェントがファイル探索に費やすターンを削減。</p>
+            <p class="capability-desc lang-en">Type <code>@</code> to instantly pick workspace files, eliminating redundant exploratory agent dialogue turns.</p>
           </div>
 
           <!-- 4 -->
           <div class="capability-card reveal">
             <div class="capability-icon-emoji">🖼️</div>
-            <h3 class="capability-title">1回限り添付 (画像/音声/動画/PDF)</h3>
-            <p class="capability-desc">該当ターンのみモデルへ送信。スライディングウィンドウで再送されないためトークンを無駄遣いしません。</p>
+            <h3 class="capability-title">
+              <span class="lang-ja">1回限り添付 (画像/音声/動画/PDF)</span>
+              <span class="lang-en">Single-Turn Attachments</span>
+            </h3>
+            <p class="capability-desc lang-ja">該当ターンのみモデルへ送信。スライディングウィンドウで再送されないためトークンを無駄遣いしません。</p>
+            <p class="capability-desc lang-en">Attach images, audio, video, or PDFs for the active turn only — never re-sent across sliding context windows.</p>
           </div>
 
           <!-- 5 -->
           <div class="capability-card reveal delay-100">
             <div class="capability-icon-emoji">🏛️</div>
-            <h3 class="capability-title">村の掟 (Village Ordinance)</h3>
-            <p class="capability-desc">全エージェントのプロンプト冒頭に適用される共通ルール。モデル間の憲法差を統一する正規化層。</p>
+            <h3 class="capability-title">
+              <span class="lang-ja">村の掟 (Village Ordinance)</span>
+              <span class="lang-en">Village Ordinances</span>
+            </h3>
+            <p class="capability-desc lang-ja">全エージェントのプロンプト冒頭に適用される共通ルール。モデル間の憲法差を統一する正規化層。</p>
+            <p class="capability-desc lang-en">Universal rules prepended to every agent prompt, acting as a normalizing constitutional layer across diverse models.</p>
           </div>
 
           <!-- 6 -->
           <div class="capability-card reveal delay-200">
             <div class="capability-icon-emoji">🎭</div>
-            <h3 class="capability-title">役割テンプレート (Roles)</h3>
-            <p class="capability-desc">エージェント作成時にプリセットを選択。色付きバッジが一覧とKizunaマップに表示されます。</p>
+            <h3 class="capability-title">
+              <span class="lang-ja">役割テンプレート (Roles)</span>
+              <span class="lang-en">Role Presets &amp; Badges</span>
+            </h3>
+            <p class="capability-desc lang-ja">エージェント作成時にプリセットを選択。色付きバッジが一覧とKizunaマップに表示されます。</p>
+            <p class="capability-desc lang-en">Quick-start agents from curated role presets, rendered with distinct colored badges across lists and Kizuna graphs.</p>
           </div>
 
           <!-- 7 -->
           <div class="capability-card reveal">
             <div class="capability-icon-emoji">📁</div>
-            <h3 class="capability-title">作業フォルダ一括変更</h3>
-            <p class="capability-desc">村全体を別プロジェクトへ切り替える際、チェックしたエージェントの作業場所を一括変更。</p>
+            <h3 class="capability-title">
+              <span class="lang-ja">作業フォルダ一括変更</span>
+              <span class="lang-en">Batch Workspace Switching</span>
+            </h3>
+            <p class="capability-desc lang-ja">村全体を別プロジェクトへ切り替える際、チェックしたエージェントの作業場所を一括変更。</p>
+            <p class="capability-desc lang-en">Switch multiple selected agents to a different project repository in a single click when pivoting context.</p>
           </div>
 
           <!-- 8 -->
           <div class="capability-card reveal delay-100">
             <div class="capability-icon-emoji">💾</div>
-            <h3 class="capability-title">会話永続化 &amp; Fork</h3>
-            <p class="capability-desc">純粋Rust製 `redb` によりアプリを閉じても再開可能。任意の地点から会話を枝分かれ（Fork）できます。</p>
+            <h3 class="capability-title">
+              <span class="lang-ja">会話永続化 &amp; Fork</span>
+              <span class="lang-en">Persistence &amp; Forking</span>
+            </h3>
+            <p class="capability-desc lang-ja">純粋Rust製 `redb` によりアプリを閉じても再開可能。任意の地点から会話を枝分かれ（Fork）できます。</p>
+            <p class="capability-desc lang-en">Zero data loss via embedded pure-Rust <code>redb</code>. Resume anytime or branch conversations at any turn.</p>
           </div>
 
           <!-- 9 -->
           <div class="capability-card reveal delay-200">
             <div class="capability-icon-emoji">📊</div>
-            <h3 class="capability-title">詳細統計 &amp; コスト管理</h3>
-            <p class="capability-desc">エージェント×モデルごとのトークン消費量と推定コスト（`≈ $`）を算出。月別締め日管理にも対応。</p>
+            <h3 class="capability-title">
+              <span class="lang-ja">詳細統計 &amp; コスト管理</span>
+              <span class="lang-en">Detailed Spend &amp; Token Telemetry</span>
+            </h3>
+            <p class="capability-desc lang-ja">エージェント×モデルごとのトークン消費量と推定コスト（`≈ $`）を算出。月別締め日管理にも対応。</p>
+            <p class="capability-desc lang-en">Real-time token usage and estimated spend (<code>≈ $</code>) per agent and model, with monthly billing cycle tracking.</p>
           </div>
 
           <!-- 10 -->
           <div class="capability-card reveal">
             <div class="capability-icon-emoji">🌐</div>
-            <h3 class="capability-title">柔軟な接続先 (Local LLM)</h3>
-            <p class="capability-desc">OpenAI / Anthropic / Gemini / xAI / Meta / Perplexity に加え、OllamaやLM Studio等のローカルLLMへも直接接続。</p>
+            <h3 class="capability-title">
+              <span class="lang-ja">柔軟な接続先 (Local LLM)</span>
+              <span class="lang-en">Flexible Providers &amp; Local LLMs</span>
+            </h3>
+            <p class="capability-desc lang-ja">OpenAI / Anthropic / Gemini / xAI / Meta / Perplexity に加え、OllamaやLM Studio等のローカルLLMへも直接接続。</p>
+            <p class="capability-desc lang-en">Direct connectivity to OpenAI, Anthropic, Gemini, xAI, Meta, and Perplexity, plus local models via Ollama or LM Studio.</p>
           </div>
 
           <!-- 11 -->
           <div class="capability-card reveal delay-100">
             <div class="capability-icon-emoji">⚙️</div>
-            <h3 class="capability-title">システム設定 &amp; 国際化</h3>
-            <p class="capability-desc">日本語・英語対応。ユーザー名・アイコン変更、トークン上限設定、安全のための確認ダイアログ。</p>
+            <h3 class="capability-title">
+              <span class="lang-ja">システム設定 &amp; 国際化</span>
+              <span class="lang-en">System Settings &amp; i18n</span>
+            </h3>
+            <p class="capability-desc lang-ja">日本語・英語対応。ユーザー名・アイコン変更、トークン上限設定、安全のための確認ダイアログ。</p>
+            <p class="capability-desc lang-en">Bilingual UI (English &amp; Japanese), custom avatars/names, configurable context limits, and safety confirmations.</p>
           </div>
 
           <!-- 12 -->
           <div class="capability-card reveal delay-200">
             <div class="capability-icon-emoji">🔒</div>
-            <h3 class="capability-title">ゼロテレメトリ</h3>
-            <p class="capability-desc">計測・解析・クラッシュ報告の仕組みを持ちません。会話ログやプロジェクトコードが開発者へ送られることはありません。</p>
+            <h3 class="capability-title">
+              <span class="lang-ja">ゼロテレメトリ</span>
+              <span class="lang-en">Zero Telemetry</span>
+            </h3>
+            <p class="capability-desc lang-ja">計測・解析・クラッシュ報告の仕組みを持ちません。会話ログやプロジェクトコードが開発者へ送られることはありません。</p>
+            <p class="capability-desc lang-en">Absolutely no telemetry, tracking, or background crash reporting. Your code and conversations remain on your machine.</p>
           </div>
         </div>
       </div>
@@ -1867,9 +2126,14 @@
     <section class="tech-stack-section" id="tech-stack">
       <div class="container">
         <div class="section-head reveal">
-          <div class="section-tag">アーキテクチャ</div>
-          <h2 class="section-title">堅牢な技術スタック</h2>
-          <p class="section-subtitle">信頼性と軽快さを極限まで追求したモダンな構成。</p>
+          <div class="section-tag">
+            <span class="lang-ja">アーキテクチャ</span>
+            <span class="lang-en">Architecture</span>
+          </div>
+          <h2 class="section-title lang-ja">堅牢な技術スタック</h2>
+          <h2 class="section-title lang-en">Uncompromising Tech Stack</h2>
+          <p class="section-subtitle lang-ja">信頼性と軽快さを極限まで追求したモダンな構成。</p>
+          <p class="section-subtitle lang-en">Modern engineering optimized for zero-overhead reliability and speed.</p>
         </div>
 
         <div class="tech-stack-grid">
@@ -1879,13 +2143,21 @@
               <span style="color: var(--accent-rust);">🦀</span>
               <span>Core (`fuseforks-core`)</span>
             </div>
-            <ul class="stack-list">
+            <ul class="stack-list lang-ja">
               <li><strong>Rust 2024 Edition</strong>: メモリ安全性と最高峰の並列処理</li>
               <li><strong>Tokio + Rayon</strong>: 非同期I/OとCPUヘビータスクの完全分離</li>
               <li><strong>redb</strong>: C非依存のピュアRust組み込みデータベース</li>
               <li><strong>Keyring</strong>: OSクレデンシャルストアによるAPIキー安全保管</li>
               <li><strong>rmcp</strong>: MCP (Model Context Protocol) クライアント＆サーバー</li>
               <li><strong>Zero GUI Dependency</strong>: ヘッドレス単体実行を機械的に保証</li>
+            </ul>
+            <ul class="stack-list lang-en">
+              <li><strong>Rust 2024 Edition</strong>: Absolute memory safety and high-concurrency efficiency</li>
+              <li><strong>Tokio + Rayon</strong>: Clean isolation of async I/O and CPU-bound parallel workloads</li>
+              <li><strong>redb</strong>: Zero-C dependency, pure-Rust embedded ACID database</li>
+              <li><strong>Keyring</strong>: Secure API key storage via OS credential managers</li>
+              <li><strong>rmcp</strong>: Official Model Context Protocol client &amp; server implementation</li>
+              <li><strong>Zero GUI Dependency</strong>: CI-verified headless standalone execution</li>
             </ul>
           </div>
 
@@ -1895,13 +2167,21 @@
               <span style="color: var(--accent-cyan);">⚡</span>
               <span>Shell (`apps/gui-tauri`)</span>
             </div>
-            <ul class="stack-list">
+            <ul class="stack-list lang-ja">
               <li><strong>Tauri v2</strong>: 超軽量・低メモリ消費のデスクトップ基盤</li>
               <li><strong>Vue 3 + TypeScript (Strict)</strong>: 反応性の高いモダンUI</li>
-              <li><strong>Bun</strong>: 超高速パッケージマネージャー & 開発環境</li>
+              <li><strong>Bun</strong>: 超高速パッケージマネージャー &amp; 開発環境</li>
               <li><strong>Tailwind CSS v4</strong>: ライト/ダーク両対応の統合カラー設計</li>
               <li><strong>v-network-graph</strong>: Kizuna（絆マップ）のSVGノード描画</li>
               <li><strong>CodeMirror 6</strong>: 村の掟や設定の高機能エディタ</li>
+            </ul>
+            <ul class="stack-list lang-en">
+              <li><strong>Tauri v2</strong>: Ultra-lightweight, memory-efficient desktop runtime</li>
+              <li><strong>Vue 3 + TypeScript (Strict)</strong>: Reactive, type-safe modern UI architecture</li>
+              <li><strong>Bun</strong>: Lightning-fast package manager and developer tooling</li>
+              <li><strong>Tailwind CSS v4</strong>: Unified color system with native light/dark theming</li>
+              <li><strong>v-network-graph</strong>: Interactive SVG node visualization for Kizuna graph</li>
+              <li><strong>CodeMirror 6</strong>: High-performance in-app editor for ordinances and configs</li>
             </ul>
           </div>
         </div>
@@ -1923,9 +2203,14 @@
             <span id="detectedOsLabel">お使いのOSを検出中...</span>
           </div>
 
-          <h2 class="download-title">エージェントの村を始めよう</h2>
-          <p class="download-subtitle">
+          <h2 class="download-title lang-ja">エージェントの村を始めよう</h2>
+          <h2 class="download-title lang-en">Start Your Agent Village Today</h2>
+
+          <p class="download-subtitle lang-ja">
             Outcasts Fuseforks はオープンソース (MPL-2.0) です。パッケージマネージャー経由なら 1 行で導入でき、更新も同じ経路で受け取れます。
+          </p>
+          <p class="download-subtitle lang-en">
+            Outcasts Fuseforks is free and open source (MPL-2.0). Install in a single line via your favorite package manager and receive frictionless updates.
           </p>
 
           <div class="install-methods">
@@ -1937,11 +2222,15 @@
               </div>
               <div class="install-cmd-row">
                 <code class="install-cmd">brew install --cask betyourluck/tap/fuseforks</code>
-                <button type="button" class="copy-btn" data-copy="brew install --cask betyourluck/tap/fuseforks" aria-label="brew install コマンドをコピー">copy</button>
+                <button type="button" class="copy-btn" data-copy="brew install --cask betyourluck/tap/fuseforks" aria-label="Copy brew install command">copy</button>
               </div>
-              <p class="install-note">
+              <p class="install-note lang-ja">
                 完全修飾名で指定してください（非公式 tap は短い名前では拒否されます）。
                 Apple Silicon 専用・署名と公証済みです。
+              </p>
+              <p class="install-note lang-en">
+                Please use the fully qualified tap name.
+                Built exclusively for Apple Silicon, signed and notarized.
               </p>
             </div>
 
@@ -1953,15 +2242,19 @@
               </div>
               <div class="install-cmd-row">
                 <code class="install-cmd">winget install --id Outcasts.Fuseforks</code>
-                <button type="button" class="copy-btn" data-copy="winget install --id Outcasts.Fuseforks" aria-label="winget install コマンドをコピー">copy</button>
+                <button type="button" class="copy-btn" data-copy="winget install --id Outcasts.Fuseforks" aria-label="Copy winget install command">copy</button>
               </div>
               <div class="install-cmd-row">
                 <code class="install-cmd">winget upgrade --id Outcasts.Fuseforks</code>
-                <button type="button" class="copy-btn" data-copy="winget upgrade --id Outcasts.Fuseforks" aria-label="winget upgrade コマンドをコピー">copy</button>
+                <button type="button" class="copy-btn" data-copy="winget upgrade --id Outcasts.Fuseforks" aria-label="Copy winget upgrade command">copy</button>
               </div>
-              <p class="install-note">
+              <p class="install-note lang-ja">
                 公式リポジトリに登録済みです。更新も同じ経路で
                 <code>winget upgrade</code> から受け取れます。
+              </p>
+              <p class="install-note lang-en">
+                Registered in the official winget repository. Updates can be received via
+                <code>winget upgrade</code>.
               </p>
             </div>
 
@@ -1969,17 +2262,24 @@
             <div class="install-card">
               <div class="install-card-head">
                 <span class="install-os">Linux</span>
-                <span class="install-tag">直接インストール</span>
+                <span class="install-tag">
+                  <span class="lang-ja">直接インストール</span>
+                  <span class="lang-en">Direct Install</span>
+                </span>
               </div>
               <code class="install-cmd">sudo dpkg -i fuseforks_*_amd64.deb</code>
-              <p class="install-note">
+              <p class="install-note lang-ja">
                 .AppImage / .deb / .rpm を配布しています。AppImage は実行権限を付けるだけで動きます。
+              </p>
+              <p class="install-note lang-en">
+                Distributing .AppImage, .deb, and .rpm. The AppImage runs immediately once given executable permissions.
               </p>
             </div>
           </div>
 
           <div class="other-downloads">
-            <span>インストーラーを直接取得:</span>
+            <span class="lang-ja">インストーラーを直接取得:</span>
+            <span class="lang-en">Direct downloads:</span>
             <a href="https://github.com/betyourluck/Fuseforks/releases/latest" class="other-link">Windows (.msi / -setup.exe)</a>
             <a href="https://github.com/betyourluck/Fuseforks/releases/latest" class="other-link">macOS (Apple Silicon .dmg)</a>
             <a href="https://github.com/betyourluck/Fuseforks/releases/latest" class="other-link">Linux (.AppImage / .deb / .rpm)</a>
@@ -1995,60 +2295,86 @@
       <div class="container">
         <div class="section-head reveal">
           <div class="section-tag">FAQ</div>
-          <h2 class="section-title">よくある質問</h2>
+          <h2 class="section-title lang-ja">よくある質問</h2>
+          <h2 class="section-title lang-en">Frequently Asked Questions</h2>
         </div>
 
         <div class="faq-grid">
           <!-- Q1 -->
           <div class="faq-item reveal">
             <button class="faq-question" type="button" aria-expanded="false">
-              <span>ライセンスと商用利用について教えてください。</span>
+              <span class="lang-ja">ライセンスと商用利用について教えてください。</span>
+              <span class="lang-en">What are the licensing terms and commercial use guidelines?</span>
               <svg class="faq-toggle-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="6 9 12 15 18 9"></polyline>
               </svg>
             </button>
             <div class="faq-answer">
-              Fuseforksは <strong>MPL-2.0 (Mozilla Public License 2.0)</strong> で公開されています。改変したFuseforksのソースコードを配布する際はそのファイルの公開義務がありますが、Fuseforksを組み込んだ独自コード（Larger Work）は独自のライセンスで配布可能です。個人的なローカル改変・利用には公開義務はありません。
+              <div class="lang-ja">
+                Fuseforksは <strong>MPL-2.0 (Mozilla Public License 2.0)</strong> で公開されています。改変したFuseforksのソースコードを配布する際はそのファイルの公開義務がありますが、Fuseforksを組み込んだ独自コード（Larger Work）は独自のライセンスで配布可能です。個人的なローカル改変・利用には公開義務はありません。
+              </div>
+              <div class="lang-en">
+                Fuseforks is released under the <strong>Mozilla Public License 2.0 (MPL-2.0)</strong>. If you distribute modified Fuseforks source files, those files must remain open under MPL-2.0. However, proprietary larger works incorporating Fuseforks may be distributed under your own terms. Personal local modifications and use do not require disclosure.
+              </div>
             </div>
           </div>
 
           <!-- Q2 -->
           <div class="faq-item reveal delay-100">
             <button class="faq-question" type="button" aria-expanded="false">
-              <span>macOSのIntel Macはサポートされていますか？</span>
+              <span class="lang-ja">macOSのIntel Macはサポートされていますか？</span>
+              <span class="lang-en">Is Intel-based macOS supported?</span>
               <svg class="faq-toggle-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="6 9 12 15 18 9"></polyline>
               </svg>
             </button>
             <div class="faq-answer">
-              いいえ。macOSの公式リリースビルドは <strong>Apple Silicon (M1/M2/M3/M4) 専用</strong> となっています。Intel Macは対象外となりますのでご了承ください。
+              <div class="lang-ja">
+                いいえ。macOSの公式リリースビルドは <strong>Apple Silicon (M1/M2/M3/M4) 専用</strong> となっています。Intel Macは対象外となりますのでご了承ください。
+              </div>
+              <div class="lang-en">
+                No. Official macOS release builds are built exclusively for <strong>Apple Silicon (M1/M2/M3/M4)</strong>. Intel-based Macs are not supported.
+              </div>
             </div>
           </div>
 
           <!-- Q3 -->
           <div class="faq-item reveal delay-200">
             <button class="faq-question" type="button" aria-expanded="false">
-              <span>APIキーや会話データのプライバシーはどう保護されますか？</span>
+              <span class="lang-ja">APIキーや会話データのプライバシーはどう保護されますか？</span>
+              <span class="lang-en">How are API keys and conversation privacy protected?</span>
               <svg class="faq-toggle-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="6 9 12 15 18 9"></polyline>
               </svg>
             </button>
             <div class="faq-answer">
-              すべての会話データはローカルの `redb` に保存され、計測・解析・クラッシュ報告の送信はありません（そのための仕組みを組み込んでいません）。APIキーはOS標準のクレデンシャルストア（Windows Credential Manager / macOS Keychain / Secret Service）に暗号化保存されます。<br><br>
-              LLM 以外の外向き通信は<strong>モデル単価表の取得だけ</strong>で、<strong>利用者が「取得」ボタンを押したときにのみ</strong>行われます（起動時・定期的な確認はしません）。既定の取得先は開発者が用意した GitHub 上の静的ファイルで、<strong>設定画面から変更・空にできます</strong>。詳細はプライバシーポリシーに記載しています。
+              <div class="lang-ja">
+                すべての会話データはローカルの `redb` に保存され、計測・解析・クラッシュ報告の送信はありません（そのための仕組みを組み込んでいません）。APIキーはOS標準のクレデンシャルストア（Windows Credential Manager / macOS Keychain / Secret Service）に暗号化保存されます。<br><br>
+                LLM 以外の外向き通信は<strong>モデル単価表の取得だけ</strong>で、<strong>利用者が「取得」ボタンを押したときにのみ</strong>行われます（起動時・定期的な確認はしません）。既定の取得先は開発者が用意した GitHub 上の静的ファイルで、<strong>設定画面から変更・空にできます</strong>。詳細はプライバシーポリシーに記載しています。
+              </div>
+              <div class="lang-en">
+                All conversation data is persisted locally in <code>redb</code>. There is zero telemetry, tracking, or crash analytics embedded in the application. API keys are securely encrypted inside OS-level vaults (Windows Credential Manager, macOS Keychain, Linux Secret Service).<br><br>
+                The only non-LLM outbound network request is fetching the <strong>pricing reference table</strong>, which occurs <strong>strictly when the user clicks the "Fetch" button</strong> (never automatically at startup or periodically). The default endpoint is a static GitHub file, which you can <strong>modify or clear in Settings</strong>. Full details are documented in our Privacy Policy.
+              </div>
             </div>
           </div>
 
           <!-- Q4 -->
           <div class="faq-item reveal delay-300">
             <button class="faq-question" type="button" aria-expanded="false">
-              <span>ローカルLLM（Ollama / LM Studio）でも動作しますか？</span>
+              <span class="lang-ja">ローカルLLM（Ollama / LM Studio）でも動作しますか？</span>
+              <span class="lang-en">Does it work with local LLMs (Ollama / LM Studio)?</span>
               <svg class="faq-toggle-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="6 9 12 15 18 9"></polyline>
               </svg>
             </button>
             <div class="faq-answer">
-              はい。ベースURLが柔軟に指定可能なため、OpenAI互換エンドポイントを提供するOllamaやLM Studio、vLLMなどのローカルLLMと直接連携できます。
+              <div class="lang-ja">
+                はい。ベースURLが柔軟に指定可能なため、OpenAI互換エンドポイントを提供するOllamaやLM Studio、vLLMなどのローカルLLMと直接連携できます。
+              </div>
+              <div class="lang-en">
+                Yes. Thanks to custom base URL configuration, Fuseforks connects directly to Ollama, LM Studio, vLLM, or any local inference server exposing an OpenAI-compatible endpoint.
+              </div>
             </div>
           </div>
         </div>
@@ -2075,35 +2401,93 @@
             <span class="outcasts-word">Outcasts</span>
             <span>Fuseforks</span>
           </div>
-          <p class="footer-desc">
+          <p class="footer-desc lang-ja">
             Keep a village of AI agents in your hands.<br>
             趣味のエンジニアのための、おもちゃの形をした本物のマルチエージェントデスクトップ。
+          </p>
+          <p class="footer-desc lang-en">
+            Keep a village of AI agents in your hands.<br>
+            A real multi-agent desktop wearing the shape of a toy, crafted for hobby engineers.
           </p>
         </div>
 
         <div>
-          <div class="footer-col-title">プロダクト</div>
+          <div class="footer-col-title">
+            <span class="lang-ja">プロダクト</span>
+            <span class="lang-en">Product</span>
+          </div>
           <ul class="footer-links">
-            <li><a href="#features" class="footer-link">コア機能</a></li>
-            <li><a href="#philosophy" class="footer-link">設計思想</a></li>
-            <li><a href="#capabilities" class="footer-link">全機能一覧</a></li>
-            <li><a href="#tech-stack" class="footer-link">技術構成</a></li>
-            <li><a href="#download" class="footer-link">ダウンロード</a></li>
+            <li>
+              <a href="#features" class="footer-link">
+                <span class="lang-ja">コア機能</span>
+                <span class="lang-en">Features</span>
+              </a>
+            </li>
+            <li>
+              <a href="#philosophy" class="footer-link">
+                <span class="lang-ja">設計思想</span>
+                <span class="lang-en">Philosophy</span>
+              </a>
+            </li>
+            <li>
+              <a href="#capabilities" class="footer-link">
+                <span class="lang-ja">全機能一覧</span>
+                <span class="lang-en">Capabilities</span>
+              </a>
+            </li>
+            <li>
+              <a href="#tech-stack" class="footer-link">
+                <span class="lang-ja">技術構成</span>
+                <span class="lang-en">Architecture</span>
+              </a>
+            </li>
+            <li>
+              <a href="#download" class="footer-link">
+                <span class="lang-ja">ダウンロード</span>
+                <span class="lang-en">Download</span>
+              </a>
+            </li>
           </ul>
         </div>
 
         <div>
-          <div class="footer-col-title">リソース</div>
+          <div class="footer-col-title">
+            <span class="lang-ja">リソース</span>
+            <span class="lang-en">Resources</span>
+          </div>
           <ul class="footer-links">
-            <li><a href="https://github.com/betyourluck/Fuseforks/blob/main/DETAIL.md" class="footer-link">ドキュメント (DETAIL.md)</a></li>
-            <li><a href="https://github.com/betyourluck/Fuseforks/blob/main/data_contract.yaml" class="footer-link">データ規約 (data_contract.yaml)</a></li>
-            <li><a href="https://github.com/betyourluck/Fuseforks/tree/main/specs" class="footer-link">仕様書 (specs/)</a></li>
-            <li><a href="https://github.com/betyourluck/Fuseforks/blob/main/PRIVACY.md" class="footer-link">プライバシーポリシー</a></li>
+            <li>
+              <a href="https://github.com/betyourluck/Fuseforks/blob/main/DETAIL.md" class="footer-link">
+                <span class="lang-ja">ドキュメント (DETAIL.md)</span>
+                <span class="lang-en">Documentation (DETAIL.md)</span>
+              </a>
+            </li>
+            <li>
+              <a href="https://github.com/betyourluck/Fuseforks/blob/main/data_contract.yaml" class="footer-link">
+                <span class="lang-ja">データ規約 (data_contract.yaml)</span>
+                <span class="lang-en">Data Contract (data_contract.yaml)</span>
+              </a>
+            </li>
+            <li>
+              <a href="https://github.com/betyourluck/Fuseforks/tree/main/specs" class="footer-link">
+                <span class="lang-ja">仕様書 (specs/)</span>
+                <span class="lang-en">Specifications (specs/)</span>
+              </a>
+            </li>
+            <li>
+              <a href="https://github.com/betyourluck/Fuseforks/blob/main/PRIVACY.md" class="footer-link">
+                <span class="lang-ja">プライバシーポリシー</span>
+                <span class="lang-en">Privacy Policy</span>
+              </a>
+            </li>
           </ul>
         </div>
 
         <div>
-          <div class="footer-col-title">コミュニティ</div>
+          <div class="footer-col-title">
+            <span class="lang-ja">コミュニティ</span>
+            <span class="lang-en">Community</span>
+          </div>
           <ul class="footer-links">
             <li><a href="https://github.com/betyourluck/Fuseforks" class="footer-link">GitHub Repository</a></li>
             <li><a href="https://github.com/betyourluck/Fuseforks/issues" class="footer-link">Issue Tracker</a></li>
@@ -2127,6 +2511,9 @@
        JavaScript Logic (Intersection Observer, OS Detection, FAQ Accordion)
        ========================================================================== -->
   <script>
+    let currentLang = document.documentElement.getAttribute('data-lang') || 'ja';
+    let detectedOSName = 'Windows';
+
     document.addEventListener('DOMContentLoaded', () => {
       // 1. JS有効化クラス付与
       document.body.classList.remove('no-js');
@@ -2172,15 +2559,66 @@
         revealElements.forEach(el => el.classList.add('is-visible'));
       }
 
-      // 5. OS自動判定ロジック & CTAボタンの最適化
+      // 5. 言語切り替え初期化
+      initLanguageSwitcher();
+
+      // 6. OS自動判定ロジック & CTAボタンの最適化
       detectUserOS();
 
-      // 6. FAQアコーディオン制御
+      // 7. FAQアコーディオン制御
       initFaqAccordion();
 
-      // 7. インストールコマンドのコピーボタン
+      // 8. インストールコマンドのコピーボタン
       initCopyButtons();
     });
+
+    /**
+     * 言語切り替えロジック
+     */
+    function initLanguageSwitcher() {
+      const buttons = document.querySelectorAll('.lang-btn[data-lang-set]');
+      buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const targetLang = btn.dataset.langSet;
+          if (targetLang && targetLang !== currentLang) {
+            setLanguage(targetLang);
+          }
+        });
+      });
+      // 初期のメタタグ & バッジの同期
+      updateLanguageMeta();
+    }
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      document.documentElement.setAttribute('data-lang', lang);
+      document.documentElement.setAttribute('lang', lang);
+      try {
+        localStorage.setItem('fuseforks_lang', lang);
+      } catch (e) {}
+      updateLanguageMeta();
+      updateOsBadge();
+    }
+
+    function updateLanguageMeta() {
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) {
+        if (currentLang === 'ja') {
+          metaDesc.setAttribute('content', 'Outcasts Fuseforks - AIエージェントの「村」を手元に。複数のAIが自律的に協調・委任・自走するデスクトップオーケストレーションツール。Rust + Tauri v2 + Vue 3。');
+        } else {
+          metaDesc.setAttribute('content', 'Outcasts Fuseforks - Keep a village of AI agents in your hands. A multi-agent desktop orchestration application. Rust + Tauri v2 + Vue 3.');
+        }
+      }
+    }
+
+    function updateOsBadge() {
+      const osBadgeLabel = document.getElementById('detectedOsLabel');
+      if (osBadgeLabel) {
+        osBadgeLabel.textContent = currentLang === 'ja'
+          ? `${detectedOSName} を検出しました`
+          : `Detected ${detectedOSName}`;
+      }
+    }
 
     /**
      * data-copy を持つボタンで、対応するコマンド文字列をクリップボードへ複製する。
@@ -2229,23 +2667,17 @@
     function detectUserOS() {
       const userAgent = navigator.userAgent || navigator.vendor || window.opera || '';
       const platform = navigator.platform || '';
-      let detectedOS = 'Windows'; // デフォルト
+      detectedOSName = 'Windows'; // デフォルト
 
       if (/Macintosh|MacIntel|MacPPC|Mac68K|Mac OS X/i.test(userAgent) || /Mac/i.test(platform)) {
-        detectedOS = 'macOS (Apple Silicon)';
+        detectedOSName = 'macOS (Apple Silicon)';
       } else if (/Linux|X11/i.test(userAgent) || /Linux/i.test(platform)) {
-        detectedOS = 'Linux';
+        detectedOSName = 'Linux';
       } else if (/Win32|Win64|Windows|WinCE/i.test(userAgent) || /Win/i.test(platform)) {
-        detectedOS = 'Windows';
+        detectedOSName = 'Windows';
       }
 
-      // 表示先はバッジの 1 箇所だけ。CTA の文言は OS で変えない —
-      // インストール手段は 3 つ並べて見せる形にしたので、片方だけを
-      // 名指しすると「他は使えない」と読める。
-      const osBadgeLabel = document.getElementById('detectedOsLabel');
-      if (osBadgeLabel) {
-        osBadgeLabel.textContent = `${detectedOS} を検出しました`;
-      }
+      updateOsBadge();
     }
 
     /**
