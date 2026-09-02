@@ -1,5 +1,5 @@
 {
- "_notice": "Derived from BerriAI/litellm model_prices_and_context_window.json (MIT License, Copyright (c) 2023 Berri AI), fetched 2026-08-18. Entries whose key contains a provider prefix (e.g. perplexity/, openai/ via Perplexity) were transcribed by hand from Perplexity's published pricing page on 2026-08-20; the same model can cost a different amount through a different gateway. Rates are approximate and provided as-is; verify against each provider's official pricing page.",
+ "_notice": "Derived from BerriAI/litellm model_prices_and_context_window.json (MIT License, Copyright (c) 2023 Berri AI), fetched 2026-08-18. Entries whose key contains a provider prefix (e.g. perplexity/, openai/ via Perplexity) were transcribed by hand from Perplexity's published pricing page on 2026-08-20; the same model can cost a different amount through a different gateway. Rates are approximate and provided as-is; verify against each provider's official pricing page. claude-fable-5-1 was transcribed by hand from Anthropic's first-party pricing on 2026-09-02 (cache read $0.25/MTok; other rates as claude-fable-5).",
  "version": 1,
  "fetched": "2026-08-20",
  "models": [
@@ -1641,6 +1641,14 @@
    "input_per_mtok": 10.0,
    "output_per_mtok": 50.0,
    "cache_read_per_mtok": 1.0,
+   "cache_write_per_mtok": 12.5,
+   "cache_write_1h_per_mtok": 20.0
+  },
+  {
+   "key": "claude-fable-5-1",
+   "input_per_mtok": 10.0,
+   "output_per_mtok": 50.0,
+   "cache_read_per_mtok": 0.25,
    "cache_write_per_mtok": 12.5,
    "cache_write_1h_per_mtok": 20.0
   },
