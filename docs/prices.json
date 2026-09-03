@@ -3663,6 +3663,12 @@
    "cache_read_per_mtok": 0.075
   },
   {
+   "key": "gemini-3.8-flash",
+   "input_per_mtok": 0.75,
+   "output_per_mtok": 3.75,
+   "cache_read_per_mtok": 0.075
+  },
+  {
    "key": "gemini-embedding-001",
    "input_per_mtok": 0.15,
    "output_per_mtok": 0
@@ -7202,6 +7208,18 @@
   },
   {
    "key": "muse-spark-1.2-contributor",
+   "input_per_mtok": 0.1,
+   "output_per_mtok": 0.2,
+   "cache_read_per_mtok": 0.002
+  },
+  {
+   "key": "muse-spark-1.3",
+   "input_per_mtok": 1.25,
+   "output_per_mtok": 4.25,
+   "cache_read_per_mtok": 0.15
+  },
+  {
+   "key": "muse-spark-1.3-contributor",
    "input_per_mtok": 0.1,
    "output_per_mtok": 0.2,
    "cache_read_per_mtok": 0.002
