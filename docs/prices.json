@@ -5543,6 +5543,7 @@
    "cache_read_per_mtok": 0.2,
    "cache_write_per_mtok": 2.5
   },
+  {
    "key": "gpt-6-astra",
    "max_input_tokens": 922,000,
    "input_per_mtok": 10.0,
