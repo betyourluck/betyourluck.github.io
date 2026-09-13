@@ -5545,7 +5545,7 @@
   },
   {
    "key": "gpt-6-astra",
-   "max_input_tokens": 922,000,
+   "max_input_tokens": 922000,
    "input_per_mtok": 10.0,
    "output_per_mtok": 50.0,
    "cache_read_per_mtok": 1.0,
