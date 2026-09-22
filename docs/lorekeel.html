@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="ja" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lorekeel (語り部) — 忘れない・矛盾しない 次世代AI TRPGゲームマスター</title>
+  <meta name="description" content="クラウドLLMをナレーターに、Rustの決定論エンジンを唯一の真実に据えたTRPGゲームマスター「Lorekeel（語り部）」。忘れない、矛盾しない最高のソロTRPG体験を。">
+  <link rel="icon" type="image/png" href="./images/lorekeel.png">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              400: '#34d399',
+              500: '#10b981',
+              600: '#059669',
+              accent: '#38bdf8',
+              gold: '#fbbf24',
+              dark: '#0b0f19',
+              darker: '#06080e',
+              card: '#111827',
+              border: '#1f293d'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'Noto Sans JP', 'sans-serif'],
+            serif: ['Shippori Mincho', 'serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Google Fonts & Lucide Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+JP:wght@300;400;500;700;900&family=Shippori+Mincho:wght@500;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      font-feature-settings: "palt";
+    }
+    .glow-effect {
+      position: absolute;
+      background: radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.15), rgba(56, 189, 248, 0.05), transparent 70%);
+      pointer-events: none;
+    }
+    .code-box {
+      background: #0d131f;
+      border: 1px solid #1f293d;
+      border-radius: 0.75rem;
+    }
+    .glass-nav {
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      background: rgba(11, 15, 25, 0.85);
+    }
+    .glass-card {
+      background: rgba(17, 24, 39, 0.75);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #34d399 0%, #38bdf8 50%, #a78bfa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  </style>
+</head>
+<body class="bg-brand-dark text-slate-100 font-sans selection:bg-brand-500 selection:text-white antialiased overflow-x-hidden">
+
+  <!-- 背景グロー装飾 -->
+  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+    <div class="glow-effect w-[800px] h-[800px] -top-64 -left-64"></div>
+    <div class="glow-effect w-[700px] h-[700px] top-1/2 -right-48 opacity-60"></div>
+    <div class="glow-effect w-[900px] h-[900px] bottom-0 left-1/3 opacity-40"></div>
+  </div>
+
+  <!-- ナビゲーションバー -->
+  <header class="fixed top-0 left-0 right-0 z-50 glass-nav border-b border-brand-border/60 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <!-- ロゴ -->
+      <a href="#" class="flex items-center gap-3 group">
+        <div class="relative w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-brand-accent p-[2px] shadow-lg shadow-brand-500/20 group-hover:scale-105 transition-transform">
+          <div class="w-full h-full bg-brand-dark rounded-[10px] flex items-center justify-center overflow-hidden">
+            <img src="./images/lorekeel.png" alt="Lorekeel Logo" class="w-7 h-7 object-contain" onerror="this.onerror=null; this.src='../images/lorekeel.png'">
+          </div>
+        </div>
+        <div>
+          <span class="text-xl font-extrabold tracking-tight text-white flex items-center gap-1.5">
+            Lorekeel <span class="text-xs font-normal px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-400 border border-brand-500/20">語り部</span>
+          </span>
+          <p class="text-[10px] text-slate-400 tracking-wider font-mono">DETERMINISTIC AI-GM</p>
+        </div>
+      </a>
+
+      <!-- ナビゲーションリンク -->
+      <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+        <a href="#about" class="hover:text-brand-400 transition-colors">Lorekeelとは</a>
+        <a href="#features" class="hover:text-brand-400 transition-colors">三権分立</a>
+        <a href="#scenarios" class="hover:text-brand-400 transition-colors">シナリオ</a>
+        <a href="#comparison" class="hover:text-brand-400 transition-colors">決定論の強み</a>
+        <a href="#install" class="hover:text-brand-400 transition-colors">インストール</a>
+        <a href="#faq" class="hover:text-brand-400 transition-colors">FAQ</a>
+      </nav>
+
+      <!-- 右側アクション -->
+      <div class="flex items-center gap-4">
+        <a href="https://github.com/betyourluck/Lorekeel" target="_blank" rel="noopener" class="p-2 text-slate-400 hover:text-white transition-colors" title="GitHub Repository">
+          <i data-lucide="github" class="w-5 h-5"></i>
+        </a>
+        <a href="#install" class="hidden sm:inline-flex items-center gap-2 bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-slate-950 font-bold px-4 py-2 rounded-xl text-sm shadow-md shadow-brand-500/20 hover:shadow-brand-500/40 hover:-translate-y-0.5 transition-all">
+          <i data-lucide="download" class="w-4 h-4"></i>
+          <span>ダウンロード</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="relative z-10 pt-28">
+    <!-- ヒーローセクション -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-20 lg:pt-20 lg:pb-28 text-center">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-800/80 border border-slate-700/80 text-brand-400 text-xs sm:text-sm font-medium mb-8 backdrop-blur-md">
+        <span class="flex h-2 w-2 rounded-full bg-brand-400 animate-pulse"></span>
+        <span>Rust決定論エンジン × 多彩なLLM × TRPG</span>
+        <span class="text-slate-500">|</span>
+        <span class="text-slate-300">v0.5 リリース中</span>
+      </div>
+
+      <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white max-w-5xl mx-auto leading-[1.15] mb-6">
+        忘れない。<br class="sm:hidden">矛盾しない。<br>
+        <span class="gradient-text">唯一の真実を裁く</span><br class="hidden sm:inline"> 次世代AI GM。
+      </h1>
+
+      <p class="max-w-3xl mx-auto text-base sm:text-xl text-slate-300 font-normal leading-relaxed mb-10">
+        AI Dungeon系のLLM-GMが崩れる最大の死因は「文章力」ではなく<strong class="text-white font-semibold underline decoration-brand-500 underline-offset-4">忘却と矛盾</strong>。<br class="hidden md:inline">
+        Lorekeelは、クラウドLLMをナレーターに、<strong class="text-white font-semibold">Rust決定論エンジンを正本（唯一の真実）</strong>に据えることで、<br class="hidden md:inline">
+        「無限の自由」ではなく<span class="text-brand-400 font-bold">「盤石の一貫性」</span>をプレイヤーに届けます。
+      </p>
+
+      <!-- ダウンロードCTAボタン群 -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+        <a href="https://github.com/betyourluck/Lorekeel/releases/latest" target="_blank" rel="noopener" class="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-brand-500 via-brand-400 to-brand-accent text-slate-950 font-extrabold text-base sm:text-lg shadow-xl shadow-brand-500/25 hover:shadow-brand-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all">
+          <i data-lucide="download" class="w-6 h-6"></i>
+          <span>最新版をダウンロード</span>
+          <span class="text-xs bg-slate-950/20 px-2 py-0.5 rounded-full font-mono text-slate-900">Win / Mac / Linux</span>
+        </a>
+        <a href="#features" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-4 rounded-2xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700/80 font-bold text-base hover:border-slate-500 transition-all">
+          <i data-lucide="sparkles" class="w-5 h-5 text-brand-400"></i>
+          <span>アーキテクチャを見る</span>
+        </a>
+      </div>
+
+      <!-- 実機UIスクリーンショット -->
+      <div class="relative max-w-5xl mx-auto group">
+        <div class="absolute -inset-1.5 bg-gradient-to-r from-brand-500/30 via-brand-accent/20 to-purple-500/30 rounded-2xl blur-xl opacity-75 group-hover:opacity-100 transition-opacity"></div>
+        <div class="relative rounded-2xl overflow-hidden border border-slate-700/80 bg-brand-card shadow-2xl">
+          <!-- ウィンドウヘッダー模倣 -->
+          <div class="h-10 bg-slate-900/90 border-b border-slate-800 px-4 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
+              <div class="w-3 h-3 rounded-full bg-yellow-500/80"></div>
+              <div class="w-3 h-3 rounded-full bg-green-500/80"></div>
+              <span class="ml-2 text-xs font-mono text-slate-400">Lorekeel v0.5 — 金曜日のレモンパイ</span>
+            </div>
+            <div class="text-[11px] font-mono text-slate-500 flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Engine Active
+            </div>
+          </div>
+          <!-- 画像 -->
+          <img src="./images/lorekeel_ui.png" alt="Lorekeel プレイ画面 UI" class="w-full h-auto object-cover" onerror="this.onerror=null; this.src='../images/lorekeel_ui.png'">
+        </div>
+        <p class="text-xs sm:text-sm text-slate-400 mt-4 text-center">
+          ▲ 実際のプレイ画面：情景背景の上にGMの語り、リアルタイムの目標・ダイス結果・所持品。すべてRustの決定論エンジンが駆動。
+        </p>
+      </div>
+    </section>
+
+    <!-- 対比セクション（AI Dungeon系との違い） -->
+    <section id="about" class="py-20 border-t border-brand-border/60 bg-brand-darker/60">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-3xl mx-auto mb-16">
+          <h2 class="text-xs sm:text-sm font-bold tracking-widest text-brand-400 uppercase mb-3">The Problem & The Solution</h2>
+          <p class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">なぜ従来のAI GMは途中で破綻するのか？</p>
+          <p class="text-slate-400 mt-4 text-sm sm:text-base">
+            どれほど優秀なLLMでも、「状態管理」を文章生成（プロンプト）に任せると必ずハルシネーションが発生します。Lorekeelは境界線を再定義しました。
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+          <!-- 従来のAI GM -->
+          <div class="glass-card rounded-2xl p-8 border-red-900/30 relative overflow-hidden">
+            <div class="absolute top-0 right-0 bg-red-500/10 text-red-400 text-xs font-bold px-3 py-1 rounded-bl-xl border-l border-b border-red-500/20">
+              従来の AI GM ツール
+            </div>
+            <div class="flex items-center gap-3 mb-6">
+              <div class="w-10 h-10 rounded-xl bg-red-500/10 text-red-400 flex items-center justify-center">
+                <i data-lucide="x-circle" class="w-6 h-6"></i>
+              </div>
+              <h3 class="text-xl font-bold text-white">LLMがすべてを「空想」</h3>
+            </div>
+            <ul class="space-y-4 text-sm text-slate-300">
+              <li class="flex items-start gap-3">
+                <i data-lucide="alert-triangle" class="w-5 h-5 text-red-400 shrink-0 mt-0.5"></i>
+                <span><strong>持ち物や死亡フラグの忘却：</strong> 倒したはずの敵が何事もなかったかのように再登場し、使った鍵が手元に残り続ける。</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <i data-lucide="alert-triangle" class="w-5 h-5 text-red-400 shrink-0 mt-0.5"></i>
+                <span><strong>ダイスの出目捏造：</strong> プレイヤーが「ダイスで100が出た」と言えば通ってしまい、スリルや達成感が消滅する。</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <i data-lucide="alert-triangle" class="w-5 h-5 text-red-400 shrink-0 mt-0.5"></i>
+                <span><strong>最高級モデルの浪費：</strong> 矛盾を抑えるために高価なフロンティアモデルを使い続け、APIコストが跳ね上がる。</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Lorekeel のアプローチ -->
+          <div class="glass-card rounded-2xl p-8 border-brand-500/40 relative overflow-hidden bg-gradient-to-b from-brand-card to-brand-500/5">
+            <div class="absolute top-0 right-0 bg-brand-500/20 text-brand-400 text-xs font-bold px-3 py-1 rounded-bl-xl border-l border-b border-brand-500/30">
+              Lorekeel (語り部)
+            </div>
+            <div class="flex items-center gap-3 mb-6">
+              <div class="w-10 h-10 rounded-xl bg-brand-500/20 text-brand-400 flex items-center justify-center">
+                <i data-lucide="shield-check" class="w-6 h-6"></i>
+              </div>
+              <h3 class="text-xl font-bold text-white">Rust決定論エンジンが「正本」</h3>
+            </div>
+            <ul class="space-y-4 text-sm text-slate-300">
+              <li class="flex items-start gap-3">
+                <i data-lucide="check-circle-2" class="w-5 h-5 text-brand-400 shrink-0 mt-0.5"></i>
+                <span><strong>不変の物理法則：</strong> HP、所持品、位置、フラグはRustが決定論的に厳密に裁定。持っていないアイテムは使えない。</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <i data-lucide="check-circle-2" class="w-5 h-5 text-brand-400 shrink-0 mt-0.5"></i>
+                <span><strong>監査可能なシード乱数：</strong> 出目は改ざん不能。同じシードなら同じ結果。緊迫感ある判定と成否の分岐が成立。</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <i data-lucide="check-circle-2" class="w-5 h-5 text-brand-400 shrink-0 mt-0.5"></i>
+                <span><strong>安価・無料・ローカルLLMでも崩れない：</strong> エンジンが不正な提案を却下するため、Ollamaなどの小規模モデルでも破綻ゼロ。</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 三権分立アーキテクチャ -->
+    <section id="features" class="py-24 border-t border-brand-border/60 relative">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-3xl mx-auto mb-16">
+          <h2 class="text-xs sm:text-sm font-bold tracking-widest text-brand-accent uppercase mb-3">Core Architecture</h2>
+          <p class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">設計の核 — 三権分立</p>
+          <p class="text-base sm:text-lg text-slate-300 mt-4 font-serif italic text-brand-400/90">
+            「LLMは提案し、エンジンが裁き、Memoriaが覚え、シナリオが縛る。」
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <!-- 1. エンジン -->
+          <div class="glass-card rounded-2xl p-6 border-slate-800 hover:border-brand-500/50 transition-all hover:-translate-y-1 group">
+            <div class="w-12 h-12 rounded-xl bg-brand-500/10 text-brand-400 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+              <i data-lucide="cpu" class="w-6 h-6"></i>
+            </div>
+            <div class="text-xs font-mono text-brand-400 font-bold mb-1">正本（唯一の真実）</div>
+            <h3 class="text-xl font-bold text-white mb-2">エンジン (Rust)</h3>
+            <p class="text-xs font-mono text-slate-500 mb-3">crates/gm_core</p>
+            <p class="text-sm text-slate-300 leading-relaxed">
+              HP・所持品・ダイス・フラグ・位置の全可変状態を決定論的に裁定。不正な操作は機械的に検知し即座に却下（無効化）します。
+            </p>
+          </div>
+
+          <!-- 2. LLM -->
+          <div class="glass-card rounded-2xl p-6 border-slate-800 hover:border-brand-accent/50 transition-all hover:-translate-y-1 group">
+            <div class="w-12 h-12 rounded-xl bg-brand-accent/10 text-brand-accent flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+              <i data-lucide="message-square" class="w-6 h-6"></i>
+            </div>
+            <div class="text-xs font-mono text-brand-accent font-bold mb-1">提案（ナレーター）</div>
+            <h3 class="text-xl font-bold text-white mb-2">LLM Client</h3>
+            <p class="text-xs font-mono text-slate-500 mb-3">Claude / Gemini / Grok / Local</p>
+            <p class="text-sm text-slate-300 leading-relaxed">
+              情景描写やNPCの台詞、行動の提案を担当。構造上、数値の真実を持たせないことでハルシネーションの毒素を完全に無害化。
+            </p>
+          </div>
+
+          <!-- 3. Memoria -->
+          <div class="glass-card rounded-2xl p-6 border-slate-800 hover:border-purple-400/50 transition-all hover:-translate-y-1 group">
+            <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+              <i data-lucide="brain" class="w-6 h-6"></i>
+            </div>
+            <div class="text-xs font-mono text-purple-400 font-bold mb-1">長期記憶（想起）</div>
+            <h3 class="text-xl font-bold text-white mb-2">Memoria</h3>
+            <p class="text-xs font-mono text-slate-500 mb-3">memoria_bridge</p>
+            <p class="text-sm text-slate-300 leading-relaxed">
+              過去の伏線やNPCの性格・約束をsemantic recall。可変状態は絶対に持たせず、自然な「長編小説のような語り」を支えます。
+            </p>
+          </div>
+
+          <!-- 4. シナリオ -->
+          <div class="glass-card rounded-2xl p-6 border-slate-800 hover:border-amber-400/50 transition-all hover:-translate-y-1 group">
+            <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+              <i data-lucide="compass" class="w-6 h-6"></i>
+            </div>
+            <div class="text-xs font-mono text-amber-400 font-bold mb-1">拘束（ワールド）</div>
+            <h3 class="text-xl font-bold text-white mb-2">Scenario Package</h3>
+            <p class="text-xs font-mono text-slate-500 mb-3">YAML パッケージ仕様</p>
+            <p class="text-sm text-slate-300 leading-relaxed">
+              場所グラフとゲート条件で、即興が筋から外れすぎるのを防ぐ。自己完結ZIP形式で作成・配布・共有が自在。
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 決定論エンジンの具体的な保証 -->
+    <section id="comparison" class="py-20 bg-brand-darker/70 border-t border-brand-border/60">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto">
+          <div class="text-center mb-12">
+            <h2 class="text-xs sm:text-sm font-bold tracking-widest text-brand-400 uppercase mb-2">Guarantees</h2>
+            <p class="text-3xl font-extrabold text-white">エンジンが保証する「揺るぎなきゲーム体験」</p>
+          </div>
+
+          <div class="space-y-4">
+            <div class="p-5 rounded-xl bg-brand-card/90 border border-slate-800 flex items-start gap-4">
+              <div class="p-2.5 rounded-lg bg-emerald-500/10 text-emerald-400 mt-1 shrink-0">
+                <i data-lucide="binary" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h4 class="text-base font-bold text-white mb-1">数値の計算・所持はすべてエンジンの管轄</h4>
+                <p class="text-sm text-slate-400">
+                  LLMは「鍛錬でSTR+2 / HP-2」などの意図のみを提案し、計算と代入はRustエンジンがアトミックに行います。不正な操作が1つでもあれば全体を却下し、ゲーム状態は無傷に保たれます。
+                </p>
+              </div>
+            </div>
+
+            <div class="p-5 rounded-xl bg-brand-card/90 border border-slate-800 flex items-start gap-4">
+              <div class="p-2.5 rounded-lg bg-sky-500/10 text-sky-400 mt-1 shrink-0">
+                <i data-lucide="dices" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h4 class="text-base font-bold text-white mb-1">決定論的・監査可能なシードダイス判定</h4>
+                <p class="text-sm text-slate-400">
+                  Seeded RNG（シード乱数）により、同じシードなら完全同一の出目を再現。ダイスロールのログはすべて記録され、プレイヤーもLLMも出目を詐称することは不可能です。
+                </p>
+              </div>
+            </div>
+
+            <div class="p-5 rounded-xl bg-brand-card/90 border border-slate-800 flex items-start gap-4">
+              <div class="p-2.5 rounded-lg bg-purple-500/10 text-purple-400 mt-1 shrink-0">
+                <i data-lucide="lock" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h4 class="text-base font-bold text-white mb-1">閉世界仮説（Closed-World）の遵守</h4>
+                <p class="text-sm text-slate-400">
+                  シナリオに定義されていない謎の超能力やアイテムは存在しません。プレイヤーが「実は未来予知が使えた」と言っても、エンジンが即座に却下し、GMは「そんな力は最初から無かった」とクールに返答します。
+                </p>
+              </div>
+            </div>
+
+            <div class="p-5 rounded-xl bg-brand-card/90 border border-slate-800 flex items-start gap-4">
+              <div class="p-2.5 rounded-lg bg-amber-500/10 text-amber-400 mt-1 shrink-0">
+                <i data-lucide="coins" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h4 class="text-base font-bold text-white mb-1">圧倒的低コスト — プロンプトキャッシュ対応</h4>
+                <p class="text-sm text-slate-400">
+                  Anthropic `cache_control`、Gemini `cachedContent`、xAI sticky routing に標準対応。長編セッションでも繰り返し送信する世界設定のトークンコストを劇的に削減します。
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- サンプルシナリオ一覧 -->
+    <section id="scenarios" class="py-24 border-t border-brand-border/60">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-3xl mx-auto mb-16">
+          <h2 class="text-xs sm:text-sm font-bold tracking-widest text-brand-400 uppercase mb-3">Scenario Packages</h2>
+          <p class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">ジャンルを問わない汎用性</p>
+          <p class="text-slate-400 mt-4 text-sm sm:text-base">
+            同一のRustエンジンが、日常ミステリからクトゥルフホラー、王道ダンジョン、人狼系まで幅広く駆動します。
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+          <!-- シナリオ1 -->
+          <div class="glass-card rounded-2xl overflow-hidden border-slate-800 hover:border-slate-600 transition-all flex flex-col">
+            <div class="h-44 bg-gradient-to-br from-amber-900/40 via-slate-900 to-slate-950 p-6 flex flex-col justify-between border-b border-slate-800/80">
+              <span class="inline-flex self-start px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                日常ミステリ
+              </span>
+              <div>
+                <h3 class="text-2xl font-bold text-white">金曜日のレモンパイ</h3>
+                <p class="text-xs text-amber-400/80 mt-1">著者: Lorekeel Studio</p>
+              </div>
+            </div>
+            <div class="p-6 flex-1 flex flex-col justify-between">
+              <p class="text-sm text-slate-300 leading-relaxed mb-6">
+                海辺の喫茶店「夕凪」に毎週金曜日午後3時に現れる謎の女性。店主は彼女にだけメニューにないレモンパイを出す。誰も死なない、しかし人生をひっくり返す真実を解き明かす探索譚。
+              </p>
+              <div class="border-t border-slate-800/80 pt-4 text-xs text-slate-400 flex items-center justify-between">
+                <span>ステータス: 観察力・共感力</span>
+                <span class="text-brand-400 font-mono">2層構造エンディング</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- シナリオ2 -->
+          <div class="glass-card rounded-2xl overflow-hidden border-slate-800 hover:border-slate-600 transition-all flex flex-col">
+            <div class="h-44 bg-gradient-to-br from-cyan-950/60 via-slate-900 to-slate-950 p-6 flex flex-col justify-between border-b border-slate-800/80">
+              <span class="inline-flex self-start px-2.5 py-1 rounded-full text-xs font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                クトゥルフ様式・探索ホラー
+              </span>
+              <div>
+                <h3 class="text-2xl font-bold text-white">湖畔の洋館</h3>
+                <p class="text-xs text-cyan-400/80 mt-1">著者: Lorekeel</p>
+              </div>
+            </div>
+            <div class="p-6 flex-1 flex flex-col justify-between">
+              <p class="text-sm text-slate-300 leading-relaxed mb-6">
+                消息を絶った蒐集家の洋館を訪ねるひと晩の探索譚。d100ロールアンダー判定、目星・聞き耳、そしてSAN値チェック。覗いて知るか、封じて守るか。狂気のエンドが待ち受ける。
+              </p>
+              <div class="border-t border-slate-800/80 pt-4 text-xs text-slate-400 flex items-center justify-between">
+                <span>判定: d100 ロールアンダー</span>
+                <span class="text-cyan-400 font-mono">SAN値・狂気判定</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- シナリオ3 -->
+          <div class="glass-card rounded-2xl overflow-hidden border-slate-800 hover:border-slate-600 transition-all flex flex-col">
+            <div class="h-44 bg-gradient-to-br from-purple-950/60 via-slate-900 to-slate-950 p-6 flex flex-col justify-between border-b border-slate-800/80">
+              <span class="inline-flex self-start px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                脱出・緊迫シチュエーション
+              </span>
+              <div>
+                <h3 class="text-2xl font-bold text-white">地下牢からの脱出</h3>
+                <p class="text-xs text-purple-400/80 mt-1">著者: Lorekeel</p>
+              </div>
+            </div>
+            <div class="p-6 flex-1 flex flex-col justify-between">
+              <p class="text-sm text-slate-300 leading-relaxed mb-6">
+                冷たい石造りの牢獄で目覚めたあなた。限られた所持品と周囲の環境を手がかりに、厳密なアイテム管理と鍵の物理ロック判定を潜り抜けて生還を目指すクラシックシナリオ。
+              </p>
+              <div class="border-t border-slate-800/80 pt-4 text-xs text-slate-400 flex items-center justify-between">
+                <span>システム: インベントリ厳密判定</span>
+                <span class="text-purple-400 font-mono">マルチ解法</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 自作シナリオ配布・書庫案内 -->
+        <div class="mt-12 p-8 rounded-2xl bg-gradient-to-r from-brand-card via-slate-900 to-brand-card border border-brand-500/20 text-center">
+          <h4 class="text-lg font-bold text-white mb-2">シナリオはYAMLで簡単自作 ＆ ZIPでワンクリック共有</h4>
+          <p class="text-sm text-slate-300 max-w-2xl mx-auto mb-4">
+            「書庫」機能により、自作シナリオをZIPファイルとして配布可能。LLMに仕様書とあらすじを渡してパッケージを自動生成することもできます。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- インストール＆ダウンロードセクション -->
+    <section id="install" class="py-24 bg-brand-darker/80 border-t border-brand-border/60">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+          <span class="px-3 py-1 rounded-full bg-brand-500/10 text-brand-400 text-xs font-mono font-bold border border-brand-500/20">
+            DOWNLOAD & SETUP
+          </span>
+          <h2 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight mt-3">
+            今すぐLorekeelをインストール
+          </h2>
+          <p class="text-slate-400 mt-3 text-sm sm:text-base">
+            お使いのOSに応じたインストーラを入手してください。MITライセンスで完全無料です。
+          </p>
+        </div>
+
+        <!-- OSタブ切り替え -->
+        <div class="flex justify-center mb-8">
+          <div class="inline-flex p-1.5 rounded-2xl bg-slate-900 border border-slate-800" role="tablist">
+            <button id="tab-btn-win" onclick="switchOsTab('win')" class="flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all bg-brand-500 text-slate-950 shadow-md">
+              <i data-lucide="monitor" class="w-4 h-4"></i>
+              <span>Windows</span>
+            </button>
+            <button id="tab-btn-mac" onclick="switchOsTab('mac')" class="flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm text-slate-400 hover:text-white transition-all">
+              <i data-lucide="apple" class="w-4 h-4"></i>
+              <span>macOS</span>
+            </button>
+            <button id="tab-btn-linux" onclick="switchOsTab('linux')" class="flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm text-slate-400 hover:text-white transition-all">
+              <i data-lucide="terminal" class="w-4 h-4"></i>
+              <span>Linux</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- OS別コンテンツパネル -->
+        <div class="glass-card rounded-3xl p-6 sm:p-10 border-slate-700/80 shadow-2xl relative">
+          <!-- Windows -->
+          <div id="tab-content-win" class="space-y-8">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-8 border-b border-slate-800">
+              <div>
+                <div class="flex items-center gap-3">
+                  <h3 class="text-2xl font-bold text-white">Windows (x64) インストーラ</h3>
+                  <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">推奨・動作確認済み</span>
+                </div>
+                <p class="text-sm text-slate-400 mt-2">
+                  Windows 10 / 11 対応（WebView2 ランタイム標準搭載）
+                </p>
+              </div>
+              <a href="https://github.com/betyourluck/Lorekeel/releases/latest" target="_blank" rel="noopener" class="w-full md:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-slate-950 font-bold text-base shadow-lg shadow-brand-500/20 hover:scale-[1.02] transition-all">
+                <i data-lucide="download" class="w-5 h-5"></i>
+                <span>.exe インストーラを入手</span>
+              </a>
+            </div>
+
+            <div>
+              <h4 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-4 flex items-center gap-2">
+                <i data-lucide="info" class="w-4 h-4 text-brand-400"></i>
+                Windowsでのインストール手順
+              </h4>
+              <ol class="space-y-4 text-sm text-slate-300">
+                <li class="flex items-start gap-3">
+                  <span class="w-6 h-6 rounded-full bg-brand-500/20 text-brand-400 font-bold flex items-center justify-center shrink-0 text-xs">1</span>
+                  <div>
+                    <strong class="text-white">インストーラを実行：</strong>
+                    ダウンロードした <code class="px-1.5 py-0.5 rounded bg-slate-800 text-brand-300 font-mono text-xs">Lorekeel_x.y.z_x64-setup.exe</code> をダブルクリックして起動します。
+                  </div>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="w-6 h-6 rounded-full bg-brand-500/20 text-brand-400 font-bold flex items-center justify-center shrink-0 text-xs">2</span>
+                  <div>
+                    <strong class="text-white">スマートスクリーン警告が出る場合：</strong>
+                    「詳細情報」をクリックし、「実行」を選択してください（オープンソース配布物のため初回のみ表示される場合があります）。
+                  </div>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="w-6 h-6 rounded-full bg-brand-500/20 text-brand-400 font-bold flex items-center justify-center shrink-0 text-xs">3</span>
+                  <div>
+                    <strong class="text-white">完了：</strong> デスクトップまたはスタートメニューの「Lorekeel」から即座に起動できます。
+                  </div>
+                </li>
+              </ol>
+            </div>
+          </div>
+
+          <!-- macOS -->
+          <div id="tab-content-mac" class="hidden space-y-8">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-8 border-b border-slate-800">
+              <div>
+                <div class="flex items-center gap-3">
+                  <h3 class="text-2xl font-bold text-white">macOS (Apple Silicon / Mシリーズ)</h3>
+                  <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">署名・公証済み</span>
+                </div>
+                <p class="text-sm text-slate-400 mt-2">
+                  Apple Silicon (M1/M2/M3/M4) 専用。実機検証済み (v0.5.17+)。
+                </p>
+              </div>
+              <a href="https://github.com/betyourluck/Lorekeel/releases/latest" target="_blank" rel="noopener" class="w-full md:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-base border border-slate-600 transition-all">
+                <i data-lucide="download" class="w-5 h-5"></i>
+                <span>.dmg を入手</span>
+              </a>
+            </div>
+
+            <div>
+              <h4 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-3">
+                Homebrew でワンライナー導入（おすすめ）
+              </h4>
+              <div class="code-box p-4 flex items-center justify-between font-mono text-sm text-brand-300 overflow-x-auto">
+                <code>brew install --cask betyourluck/tap/lorekeel</code>
+                <button onclick="copyCommand('brew install --cask betyourluck/tap/lorekeel', this)" class="ml-4 p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors shrink-0" title="コピー">
+                  <i data-lucide="copy" class="w-4 h-4"></i>
+                </button>
+              </div>
+              <p class="text-xs text-slate-400 mt-2">
+                ※ 完全修飾名（betyourluck/tap/lorekeel）をそのまま指定してください。アンインストール時は <code class="font-mono text-slate-300">brew uninstall --cask lorekeel</code> でセーブデータを残したまま安全に削除できます。
+              </p>
+            </div>
+          </div>
+
+          <!-- Linux -->
+          <div id="tab-content-linux" class="hidden space-y-8">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-8 border-b border-slate-800">
+              <div>
+                <h3 class="text-2xl font-bold text-white">Linux (.AppImage / .deb / .rpm)</h3>
+                <p class="text-sm text-slate-400 mt-2">
+                  Ubuntu / Debian / Fedora 等各ディストリビューション対応
+                </p>
+              </div>
+              <a href="https://github.com/betyourluck/Lorekeel/releases/latest" target="_blank" rel="noopener" class="w-full md:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-base border border-slate-600 transition-all">
+                <i data-lucide="download" class="w-5 h-5"></i>
+                <span>パッケージ一覧へ</span>
+              </a>
+            </div>
+
+            <div>
+              <h4 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-3">
+                ソースコードからのビルド（開発者向け）
+              </h4>
+              <div class="code-box p-4 font-mono text-xs sm:text-sm text-slate-300 space-y-2 overflow-x-auto">
+                <div class="text-slate-500"># リポジトリをクローン</div>
+                <div class="text-brand-300">git clone https://github.com/betyourluck/Lorekeel.git</div>
+                <div class="text-slate-500"># フロントエンド依存関係のインストールと起動</div>
+                <div class="text-brand-300">cd Lorekeel/app && npm install && npm run tauri dev</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3ステップ・クイックスタート -->
+        <div class="mt-16">
+          <div class="text-center mb-10">
+            <h3 class="text-2xl font-bold text-white">起動後の3ステップ・クイックスタート</h3>
+            <p class="text-slate-400 text-sm mt-1">インストール後、わずか1分でゲームを開始できます</p>
+          </div>
+
+          <div class="grid md:grid-cols-3 gap-6">
+            <div class="p-6 rounded-2xl bg-brand-card border border-slate-800 relative">
+              <div class="w-8 h-8 rounded-full bg-brand-500 text-slate-950 font-black flex items-center justify-center mb-4">1</div>
+              <h4 class="text-lg font-bold text-white mb-2">アプリを起動</h4>
+              <p class="text-sm text-slate-400">
+                インストールされた「Lorekeel」を開きます。初回起動時には快適な設定案内が表示されます。
+              </p>
+            </div>
+            <div class="p-6 rounded-2xl bg-brand-card border border-slate-800 relative">
+              <div class="w-8 h-8 rounded-full bg-brand-500 text-slate-950 font-black flex items-center justify-center mb-4">2</div>
+              <h4 class="text-lg font-bold text-white mb-2">AIモデルを設定</h4>
+              <p class="text-sm text-slate-400">
+                <strong>設定 → AIモデル</strong> を開き、お好みのプロバイダ（Claude、Gemini、OpenAI、またはOllama等のローカルURL）を設定。
+              </p>
+            </div>
+            <div class="p-6 rounded-2xl bg-brand-card border border-slate-800 relative">
+              <div class="w-8 h-8 rounded-full bg-brand-500 text-slate-950 font-black flex items-center justify-center mb-4">3</div>
+              <h4 class="text-lg font-bold text-white mb-2">シナリオを選択</h4>
+              <p class="text-sm text-slate-400">
+                同梱のシナリオ（金曜日のレモンパイ等）を選ぶか、書庫からお好みのパッケージを選んですぐに旅に出かけましょう！
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQセクション -->
+    <section id="faq" class="py-24 border-t border-brand-border/60">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <h2 class="text-xs sm:text-sm font-bold tracking-widest text-brand-400 uppercase mb-3">FAQ</h2>
+          <p class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">よくあるご質問</p>
+        </div>
+
+        <div class="space-y-4">
+          <!-- FAQ 1 -->
+          <div class="glass-card rounded-2xl border-slate-800 overflow-hidden">
+            <button onclick="toggleFaq(this)" class="w-full p-6 text-left flex items-center justify-between gap-4 hover:bg-slate-800/40 transition-colors">
+              <span class="font-bold text-white text-base sm:text-lg">有料のAPIキーは必須ですか？無料やローカルモデルでも遊べますか？</span>
+              <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400 shrink-0 transition-transform"></i>
+            </button>
+            <div class="px-6 pb-6 text-sm text-slate-300 leading-relaxed hidden border-t border-slate-800/60 pt-4">
+              <strong>完全ローカル・無料モデルでも動作します。</strong><br>
+              Lorekeelの最大の特長は、Rustエンジンがゲーム状態の正しさを裏で保証する点です。そのため、小規模なローカルモデル（OllamaやLM Studio等で動くLlama-3、Qwen、Gemmaなど）でも矛盾を起こさずにプレイできます。よりリッチで情緒豊かな描写を楽しみたい場合はClaude 3.5 SonnetやGemini、GPT-4oなどのAPIキーを設定することも可能です。
+            </div>
+          </div>
+
+          <!-- FAQ 2 -->
+          <div class="glass-card rounded-2xl border-slate-800 overflow-hidden">
+            <button onclick="toggleFaq(this)" class="w-full p-6 text-left flex items-center justify-between gap-4 hover:bg-slate-800/40 transition-colors">
+              <span class="font-bold text-white text-base sm:text-lg">「AI Dungeon」などの従来のAIゲームと何が違うのですか？</span>
+              <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400 shrink-0 transition-transform"></i>
+            </button>
+            <div class="px-6 pb-6 text-sm text-slate-300 leading-relaxed hidden border-t border-slate-800/60 pt-4">
+              従来のAIゲームはプロンプトのコンテキストに頼ってゲームを進行するため、会話が長くなると「HPや所持品を忘れる」「死んだキャラが蘇る」「ダイスの出目を捏造する」といった問題が必ず起きていました。<br>
+              Lorekeelは「LLMには状態の真実を持たせない」という三権分立設計を採用。数値・所持品・判定フラグをRustエンジンが厳密に管理するため、何十ターン経過しても一貫性が崩れません。
+            </div>
+          </div>
+
+          <!-- FAQ 3 -->
+          <div class="glass-card rounded-2xl border-slate-800 overflow-hidden">
+            <button onclick="toggleFaq(this)" class="w-full p-6 text-left flex items-center justify-between gap-4 hover:bg-slate-800/40 transition-colors">
+              <span class="font-bold text-white text-base sm:text-lg">自作のシナリオを作って遊ぶことはできますか？</span>
+              <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400 shrink-0 transition-transform"></i>
+            </button>
+            <div class="px-6 pb-6 text-sm text-slate-300 leading-relaxed hidden border-t border-slate-800/60 pt-4">
+              <strong>はい、大歓迎です！</strong><br>
+              シナリオはシンプルなYAMLファイル形式で記述された自己完結パッケージです。場所グラフ、NPC、イベントフラグ、ダイス判定ルールなどを定義できます。フォルダをZIP化して友人に配布したり、アプリ内の書庫機能で共有することもできます。
+            </div>
+          </div>
+
+          <!-- FAQ 4 -->
+          <div class="glass-card rounded-2xl border-slate-800 overflow-hidden">
+            <button onclick="toggleFaq(this)" class="w-full p-6 text-left flex items-center justify-between gap-4 hover:bg-slate-800/40 transition-colors">
+              <span class="font-bold text-white text-base sm:text-lg">商用利用や改造・再配布は可能ですか？</span>
+              <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400 shrink-0 transition-transform"></i>
+            </button>
+            <div class="px-6 pb-6 text-sm text-slate-300 leading-relaxed hidden border-t border-slate-800/60 pt-4">
+              Lorekeelは<strong>MITライセンス</strong>で公開されているオープンソースプロジェクトです。エンジンも同梱シナリオも自由に利用・改変・再配布が可能です。
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 下部CTA -->
+    <section class="py-20 border-t border-brand-border/60 bg-gradient-to-b from-brand-dark to-brand-darker relative overflow-hidden">
+      <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
+        <h2 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight mb-6">
+          物語の破綻にサヨナラを。<br>
+          真実が支えるTRPGを体験しよう。
+        </h2>
+        <p class="text-slate-300 text-base sm:text-lg mb-10 max-w-2xl mx-auto">
+          Lorekeel（語り部）は今すぐ無料でダウンロードできます。<br>
+          あなたの最高のパートナーとなるゲームマスターが、ここに待っています。
+        </p>
+        <a href="https://github.com/betyourluck/Lorekeel/releases/latest" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-3 px-10 py-5 rounded-2xl bg-gradient-to-r from-brand-500 via-brand-400 to-brand-accent text-slate-950 font-extrabold text-lg shadow-2xl shadow-brand-500/30 hover:scale-105 transition-all">
+          <i data-lucide="download" class="w-6 h-6"></i>
+          <span>今すぐLorekeelを入手する</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- フッター -->
+  <footer class="border-t border-brand-border/60 bg-brand-darker py-12 text-slate-500 text-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+      <div class="flex items-center gap-3">
+        <img src="./images/lorekeel.png" alt="Lorekeel" class="w-6 h-6 object-contain" onerror="this.onerror=null; this.src='../images/lorekeel.png'">
+        <span class="text-slate-300 font-bold">Lorekeel (語り部)</span>
+        <span class="text-xs">Released under MIT License</span>
+      </div>
+      <div class="flex items-center gap-6">
+        <a href="https://github.com/betyourluck/Lorekeel" target="_blank" rel="noopener" class="hover:text-slate-300 transition-colors flex items-center gap-1.5">
+          <i data-lucide="github" class="w-4 h-4"></i> GitHub
+        </a>
+        <a href="https://github.com/betyourluck/Lorekeel/releases" target="_blank" rel="noopener" class="hover:text-slate-300 transition-colors">
+          Releases
+        </a>
+        <a href="#install" class="hover:text-slate-300 transition-colors">
+          インストール
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- スクリプト -->
+  <script>
+    // Lucide Icons 初期化
+    lucide.createIcons();
+
+    // OS タブ切り替え
+    function switchOsTab(os) {
+      const tabs = ['win', 'mac', 'linux'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`tab-btn-${t}`);
+        const content = document.getElementById(`tab-content-${t}`);
+        if (t === os) {
+          btn.className = "flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all bg-brand-500 text-slate-950 shadow-md";
+          content.classList.remove('hidden');
+        } else {
+          btn.className = "flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm text-slate-400 hover:text-white transition-all";
+          content.classList.add('hidden');
+        }
+      });
+    }
+
+    // コマンドコピー
+    function copyCommand(text, btn) {
+      navigator.clipboard.writeText(text).then(() => {
+        const icon = btn.querySelector('i');
+        btn.innerHTML = '<span class="text-xs text-brand-400 font-bold">Copied!</span>';
+        setTimeout(() => {
+          btn.innerHTML = '<i data-lucide="copy" class="w-4 h-4"></i>';
+          lucide.createIcons();
+        }, 2000);
+      });
+    }
+
+    // FAQ アコーディオン
+    function toggleFaq(btn) {
+      const content = btn.nextElementSibling;
+      const icon = btn.querySelector('i');
+      const isHidden = content.classList.contains('hidden');
+      
+      if (isHidden) {
+        content.classList.remove('hidden');
+        icon.style.transform = 'rotate(180deg)';
+      } else {
+        content.classList.add('hidden');
+        icon.style.transform = 'rotate(0deg)';
+      }
+    }
+  </script>
+</body>
+</html>
