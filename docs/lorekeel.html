@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lorekeel (語り部) — 忘れない・矛盾しない 次世代AI TRPGゲームマスター</title>
-  <meta name="description" content="クラウドLLMをナレーターに、Rustの決定論エンジンを唯一の真実に据えたTRPGゲームマスター「Lorekeel（語り部）」。忘れない、矛盾しない最高のソロTRPG体験を。">
+  <title>Outcasts Lorekeel— 記憶をなくさないTRPGゲームマスター</title>
+  <meta name="description" content="LLMが物語を紡ぎ、Rustの決定論エンジンが世界の出来事を記録する。Outcasts Lorekeelは、一貫したソロTRPG体験のためのゲームマスターです。">
   <link rel="icon" type="image/png" href="./images/lorekeel.png">
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -15,21 +15,21 @@
         extend: {
           colors: {
             brand: {
-              50: '#ecfdf5',
-              100: '#d1fae5',
-              400: '#34d399',
-              500: '#10b981',
-              600: '#059669',
-              accent: '#38bdf8',
-              gold: '#fbbf24',
-              dark: '#0b0f19',
-              darker: '#06080e',
-              card: '#111827',
-              border: '#1f293d'
+              50: '#f7efe2',
+              100: '#ead9ba',
+              400: '#d6ad6b',
+              500: '#b87935',
+              600: '#8d5526',
+              accent: '#9aa7d8',
+              gold: '#d6ad6b',
+              dark: '#111217',
+              darker: '#090a0e',
+              card: '#191a21',
+              border: '#302f35'
             }
           },
           fontFamily: {
-            sans: ['Inter', 'Noto Sans JP', 'sans-serif'],
+            sans: ['Noto Sans JP', 'sans-serif'],
             serif: ['Shippori Mincho', 'serif'],
           }
         }
@@ -39,37 +39,59 @@
   <!-- Google Fonts & Lucide Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+JP:wght@300;400;500;700;900&family=Shippori+Mincho:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DotGothic16&family=Noto+Sans+JP:wght@400;500;600;700;900&family=Shippori+Mincho:wght@500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
+    :root { color-scheme: dark; }
     body {
       font-feature-settings: "palt";
+      background-color: #111217;
+      background-image: linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+      background-size: 36px 36px;
     }
-    .glow-effect {
-      position: absolute;
-      background: radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.15), rgba(56, 189, 248, 0.05), transparent 70%);
-      pointer-events: none;
-    }
+    ::selection { background: #b87935; color: #fff; }
+    .glow-effect { display: none; }
     .code-box {
-      background: #0d131f;
-      border: 1px solid #1f293d;
-      border-radius: 0.75rem;
+      background: #0c0d11;
+      border: 1px solid #37353a;
+      border-radius: .25rem;
     }
     .glass-nav {
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      background: rgba(11, 15, 25, 0.85);
+      background: rgba(9, 10, 14, .92);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
     }
     .glass-card {
-      background: rgba(17, 24, 39, 0.75);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.07);
+      background: #191a21;
+      border: 1px solid #302f35;
+      box-shadow: none;
     }
     .gradient-text {
-      background: linear-gradient(135deg, #34d399 0%, #38bdf8 50%, #a78bfa 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: #d6ad6b;
+      background: none;
+      -webkit-text-fill-color: currentColor;
     }
+    h1, h2, h3 { font-family: 'Shippori Mincho', serif; }
+    .font-mono { font-family: 'DM Mono', monospace; }
+    /* Fuseforks のアプリタイトルバーと同じ Outcasts ワードマーク */
+    .outcasts-word {
+      color: oklch(0.63 0.24 303);
+      font-family: 'DotGothic16', sans-serif;
+      text-shadow: 0 0 6px oklch(0.63 0.24 303 / 0.8), 0 0 18px oklch(0.63 0.24 303 / 0.4);
+    }
+    a, button { -webkit-tap-highlight-color: transparent; }
+    a:focus-visible, button:focus-visible { outline: 2px solid #d6ad6b; outline-offset: 3px; }
+    a[class*="bg-gradient"], section a[class*="from-brand"] {
+      background: #b87935 !important;
+      background-image: none !important;
+      color: #fffaf2 !important;
+      box-shadow: none !important;
+    }
+    a[class*="bg-gradient"]:hover, section a[class*="from-brand"]:hover { background: #d6ad6b !important; color: #17120d !important; }
+    .group-hover\:scale-105, .group-hover\:scale-110 { transform: none !important; }
+    .hover\:-translate-y-1:hover, .hover\:-translate-y-0\.5:hover { transform: none !important; }
+    .hover\:scale-105:hover, .hover\:scale-\[1\.02\]:hover { transform: none !important; }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; } }
   </style>
 </head>
 <body class="bg-brand-dark text-slate-100 font-sans selection:bg-brand-500 selection:text-white antialiased overflow-x-hidden">
@@ -82,8 +104,8 @@
   </div>
 
   <!-- ナビゲーションバー -->
-  <header class="fixed top-0 left-0 right-0 z-50 glass-nav border-b border-brand-border/60 transition-all duration-300">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+  <header class="fixed top-0 left-0 right-0 z-50 glass-nav border-b border-brand-border/80 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-[4.5rem] flex items-center justify-between">
       <!-- ロゴ -->
       <a href="#" class="flex items-center gap-3 group">
         <div class="relative w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-brand-accent p-[2px] shadow-lg shadow-brand-500/20 group-hover:scale-105 transition-transform">
@@ -93,7 +115,7 @@
         </div>
         <div>
           <span class="text-xl font-extrabold tracking-tight text-white flex items-center gap-1.5">
-            Lorekeel <span class="text-xs font-normal px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-400 border border-brand-500/20">語り部</span>
+            <span class="outcasts-word">Outcasts</span><span>Lorekeel</span>
           </span>
           <p class="text-[10px] text-slate-400 tracking-wider font-mono">DETERMINISTIC AI-GM</p>
         </div>
@@ -125,41 +147,38 @@
   <main class="relative z-10 pt-28">
     <!-- ヒーローセクション -->
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-20 lg:pt-20 lg:pb-28 text-center">
-      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-800/80 border border-slate-700/80 text-brand-400 text-xs sm:text-sm font-medium mb-8 backdrop-blur-md">
-        <span class="flex h-2 w-2 rounded-full bg-brand-400 animate-pulse"></span>
-        <span>Rust決定論エンジン × 多彩なLLM × TRPG</span>
-        <span class="text-slate-500">|</span>
-        <span class="text-slate-300">v0.5 リリース中</span>
+      <div class="inline-flex items-center gap-2 px-3 py-1.5 border-y border-brand-500/50 text-brand-400 text-[11px] sm:text-xs font-mono tracking-[.12em] mb-8">
+        <span>RUST ENGINE</span>
+        <span class="text-slate-600">/</span>
+        <span>LLM NARRATIVE</span>
       </div>
 
-      <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white max-w-5xl mx-auto leading-[1.15] mb-6">
-        忘れない。<br class="sm:hidden">矛盾しない。<br>
-        <span class="gradient-text">唯一の真実を裁く</span><br class="hidden sm:inline"> 次世代AI GM。
+      <h1 class="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-[-0.04em] text-white max-w-5xl mx-auto leading-[1.28] mb-7">
+        物語は、<span class="gradient-text">記憶をなくさない。</span>
       </h1>
 
-      <p class="max-w-3xl mx-auto text-base sm:text-xl text-slate-300 font-normal leading-relaxed mb-10">
-        AI Dungeon系のLLM-GMが崩れる最大の死因は「文章力」ではなく<strong class="text-white font-semibold underline decoration-brand-500 underline-offset-4">忘却と矛盾</strong>。<br class="hidden md:inline">
-        Lorekeelは、クラウドLLMをナレーターに、<strong class="text-white font-semibold">Rust決定論エンジンを正本（唯一の真実）</strong>に据えることで、<br class="hidden md:inline">
-        「無限の自由」ではなく<span class="text-brand-400 font-bold">「盤石の一貫性」</span>をプレイヤーに届けます。
+      <p class="max-w-2xl mx-auto text-base sm:text-lg text-slate-300 font-normal leading-[2] mb-10">
+        Lorekeelは、語りの豊かさとゲームの厳密さを分けて考えます。<br class="hidden md:inline">
+        LLMは物語を紡ぎ、Rustの決定論エンジンが、世界で起きたことを静かに記録し続けます。
       </p>
 
       <!-- ダウンロードCTAボタン群 -->
       <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-        <a href="https://github.com/betyourluck/Lorekeel/releases/latest" target="_blank" rel="noopener" class="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-brand-500 via-brand-400 to-brand-accent text-slate-950 font-extrabold text-base sm:text-lg shadow-xl shadow-brand-500/25 hover:shadow-brand-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all">
+        <a href="https://github.com/betyourluck/Lorekeel/releases/latest" target="_blank" rel="noopener" class="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-sm bg-gradient-to-r from-brand-500 via-brand-400 to-brand-accent text-slate-950 font-extrabold text-base sm:text-lg shadow-xl shadow-brand-500/25 hover:shadow-brand-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all">
           <i data-lucide="download" class="w-6 h-6"></i>
           <span>最新版をダウンロード</span>
           <span class="text-xs bg-slate-950/20 px-2 py-0.5 rounded-full font-mono text-slate-900">Win / Mac / Linux</span>
         </a>
-        <a href="#features" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-4 rounded-2xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700/80 font-bold text-base hover:border-slate-500 transition-all">
-          <i data-lucide="sparkles" class="w-5 h-5 text-brand-400"></i>
+        <a href="#features" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-4 rounded-sm bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700/80 font-bold text-base hover:border-slate-500 transition-all">
+          <i data-lucide="network" class="w-5 h-5 text-brand-400"></i>
           <span>アーキテクチャを見る</span>
         </a>
       </div>
 
       <!-- 実機UIスクリーンショット -->
       <div class="relative max-w-5xl mx-auto group">
-        <div class="absolute -inset-1.5 bg-gradient-to-r from-brand-500/30 via-brand-accent/20 to-purple-500/30 rounded-2xl blur-xl opacity-75 group-hover:opacity-100 transition-opacity"></div>
-        <div class="relative rounded-2xl overflow-hidden border border-slate-700/80 bg-brand-card shadow-2xl">
+        <div class="absolute -inset-px bg-brand-500/40 opacity-70"></div>
+        <div class="relative rounded-sm overflow-hidden border border-slate-700/80 bg-brand-card shadow-2xl shadow-black/40">
           <!-- ウィンドウヘッダー模倣 -->
           <div class="h-10 bg-slate-900/90 border-b border-slate-800 px-4 flex items-center justify-between">
             <div class="flex items-center gap-2">
@@ -715,7 +734,7 @@
           真実が支えるTRPGを体験しよう。
         </h2>
         <p class="text-slate-300 text-base sm:text-lg mb-10 max-w-2xl mx-auto">
-          Lorekeel（語り部）は今すぐ無料でダウンロードできます。<br>
+          Outcasts Lorekeelは今すぐ無料でダウンロードできます。<br>
           あなたの最高のパートナーとなるゲームマスターが、ここに待っています。
         </p>
         <a href="https://github.com/betyourluck/Lorekeel/releases/latest" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-3 px-10 py-5 rounded-2xl bg-gradient-to-r from-brand-500 via-brand-400 to-brand-accent text-slate-950 font-extrabold text-lg shadow-2xl shadow-brand-500/30 hover:scale-105 transition-all">
@@ -731,7 +750,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
       <div class="flex items-center gap-3">
         <img src="./images/lorekeel.png" alt="Lorekeel" class="w-6 h-6 object-contain" onerror="this.onerror=null; this.src='../images/lorekeel.png'">
-        <span class="text-slate-300 font-bold">Lorekeel (語り部)</span>
+        <span class="text-slate-300 font-bold">Outcasts Lorekeel (旧名・語り部)</span>
         <span class="text-xs">Released under MIT License</span>
       </div>
       <div class="flex items-center gap-6">
