@@ -530,17 +530,32 @@
             <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-8 border-b border-slate-800">
               <div>
                 <div class="flex items-center gap-3">
-                  <h3 class="text-2xl font-bold text-white">Windows (x64) インストーラ</h3>
-                  <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">推奨・動作確認済み</span>
+                  <h3 class="text-2xl font-bold text-white">Windows (x64)</h3>
+                  <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">winget 対応・動作確認済み</span>
                 </div>
                 <p class="text-sm text-slate-400 mt-2">
                   Windows 10 / 11 対応（WebView2 ランタイム標準搭載）
                 </p>
               </div>
-              <a href="https://github.com/betyourluck/Lorekeel/releases/latest" target="_blank" rel="noopener" class="w-full md:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-slate-950 font-bold text-base shadow-lg shadow-brand-500/20 hover:scale-[1.02] transition-all">
+              <a href="https://github.com/betyourluck/Lorekeel/releases/latest" target="_blank" rel="noopener" class="w-full md:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-base border border-slate-600 transition-all">
                 <i data-lucide="download" class="w-5 h-5"></i>
-                <span>.exe インストーラを入手</span>
+                <span>.msi / .exe を入手</span>
               </a>
+            </div>
+
+            <div>
+              <h4 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-3">
+                winget でワンライナー導入（おすすめ）
+              </h4>
+              <div class="code-box p-4 flex items-center justify-between font-mono text-sm text-brand-300 overflow-x-auto">
+                <code>winget install Outcasts.Lorekeel</code>
+                <button onclick="copyCommand('winget install Outcasts.Lorekeel', this)" class="ml-4 p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors shrink-0" title="コピー">
+                  <i data-lucide="copy" class="w-4 h-4"></i>
+                </button>
+              </div>
+              <p class="text-xs text-slate-400 mt-2">
+                ※ 更新は <code class="font-mono text-slate-300">winget upgrade Outcasts.Lorekeel</code>、アンインストールは <code class="font-mono text-slate-300">winget uninstall Outcasts.Lorekeel</code>（セーブデータと API キーは残ります）。新しい版は winget に届くまで、GitHub のリリースより遅れることがあります。
+              </p>
             </div>
 
             <div>
@@ -552,24 +567,27 @@
                 <li class="flex items-start gap-3">
                   <span class="w-6 h-6 rounded-full bg-brand-500/20 text-brand-400 font-bold flex items-center justify-center shrink-0 text-xs">1</span>
                   <div>
-                    <strong class="text-white">インストーラを実行：</strong>
-                    ダウンロードした <code class="px-1.5 py-0.5 rounded bg-slate-800 text-brand-300 font-mono text-xs">Lorekeel_x.y.z_x64-setup.exe</code> をダブルクリックして起動します。
+                    <strong class="text-white">コマンドを実行：</strong>
+                    PowerShell またはターミナルを開き、上の <code class="px-1.5 py-0.5 rounded bg-slate-800 text-brand-300 font-mono text-xs">winget install Outcasts.Lorekeel</code> を貼り付けて実行します。
                   </div>
                 </li>
                 <li class="flex items-start gap-3">
                   <span class="w-6 h-6 rounded-full bg-brand-500/20 text-brand-400 font-bold flex items-center justify-center shrink-0 text-xs">2</span>
                   <div>
-                    <strong class="text-white">スマートスクリーン警告が出る場合：</strong>
-                    「詳細情報」をクリックし、「実行」を選択してください（オープンソース配布物のため初回のみ表示される場合があります）。
+                    <strong class="text-white">管理者権限の確認：</strong>
+                    全ユーザー向けにインストールするため、確認画面が出たら「はい」を選択してください。
                   </div>
                 </li>
                 <li class="flex items-start gap-3">
                   <span class="w-6 h-6 rounded-full bg-brand-500/20 text-brand-400 font-bold flex items-center justify-center shrink-0 text-xs">3</span>
                   <div>
-                    <strong class="text-white">完了：</strong> デスクトップまたはスタートメニューの「Lorekeel」から即座に起動できます。
+                    <strong class="text-white">完了：</strong> スタートメニューの「Lorekeel」から起動できます。
                   </div>
                 </li>
               </ol>
+              <p class="text-xs text-slate-400 mt-4">
+                ※ 以前 <code class="font-mono text-slate-300">Lorekeel_x.y.z_x64-setup.exe</code> でインストールしていた場合は、先にそちらをアンインストールしてください（2 つのインストーラは互いを置き換えず、アプリが 2 つ並びます）。winget を使わず手動で入れる場合は、上のボタンから <code class="font-mono text-slate-300">.msi</code> または <code class="font-mono text-slate-300">.exe</code> を入手してください。スマートスクリーンの警告が出たら「詳細情報」→「実行」を選択します。
+              </p>
             </div>
           </div>
 

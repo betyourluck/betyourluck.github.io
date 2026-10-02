@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Imagen Prompt Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/duotone/style.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 既存のスタイルを継承 */
+        :root {
+            --bg-color: #0D1117;
+            --panel-bg-color: #161B22;
+            --border-color: #30363D;
+            --accent-color-primary: #F72585;
+            --accent-color-secondary: #4CC9F0;
+            --text-color: #C9D1D9;
+            --text-color-secondary: #8B949E;
+            --font-primary: 'Orbitron', sans-serif;
+            --font-secondary: 'Rajdhani', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-secondary);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            background-image:
+                linear-gradient(rgba(22, 27, 34, 0.95), rgba(22, 27, 34, 0.95)),
+                url('https://placehold.co/1920x1080/0D1117/30363D?text=GRID');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background-color: var(--panel-bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5), 0 0 40px rgba(76, 201, 240, 0.2);
+            position: relative;
+            overflow: hidden;
+            padding: 2.5rem;
+        }
+
+        .container::before, .container::after {
+            content: '';
+            position: absolute;
+            width: 150px;
+            height: 2px;
+            background: var(--accent-color-secondary);
+            box-shadow: 0 0 5px var(--accent-color-secondary), 0 0 10px var(--accent-color-secondary);
+            animation: flicker 3s infinite linear;
+        }
+        .container::before { top: 0; left: -50px; transform: skewX(-45deg); }
+        .container::after { bottom: 0; right: -50px; transform: skewX(-45deg); }
+
+        @keyframes flicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+        .app-header h1 {
+            font-family: var(--font-primary);
+            color: #ddf;
+            text-align: center;
+            font-size: 2.5rem;
+            letter-spacing: 2px;
+            text-shadow: 0 0 5px var(--accent-color-secondary), 0 0 10px var(--accent-color-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .form-group label, .output-area > label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text-color-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .form-group label i, .output-area > label i {
+            font-size: 1.2rem;
+            color: var(--accent-color-secondary);
+            transition: color 0.3s ease;
+        }
+        .form-group:focus-within label i { color: var(--accent-color-primary); }
+
+        .input-base {
+            width: 100%;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 0.75rem;
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        .input-base:focus {
+            outline: none;
+            border-color: var(--accent-color-secondary);
+            box-shadow: 0 0 10px rgba(76, 201, 240, 0.5);
+        }
+        .input-base.error { border-color: #e60000; box-shadow: 0 0 10px rgba(230, 0, 0, 0.7); }
+
+        textarea.input-base {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .checkbox-group, .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .custom-checkbox, .custom-radio { position: relative; display: inline-block; }
+        .custom-checkbox input, .custom-radio input { opacity: 0; width: 0; height: 0; position: absolute; }
+
+        .custom-checkbox label, .custom-radio label {
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            user-select: none;
+            font-size: 0.9rem;
+            background: rgba(22, 27, 34, 0.5);
+        }
+
+        .custom-checkbox input:checked + label, .custom-radio input:checked + label {
+            background-color: var(--accent-color-secondary);
+            color: var(--bg-color);
+            border-color: var(--accent-color-secondary);
+            box-shadow: 0 0 8px rgba(76, 201, 240, 0.6);
+            font-weight: bold;
+        }
+
+        /* --- New UI Elements --- */
+        .toggle-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+        }
+        .toggle-label { font-size: 0.9rem; color: var(--text-color); }
+
+        .section-divider {
+            grid-column: 1 / -1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+            margin: 1rem 0;
+        }
+
+        .output-area { margin-top: 2rem; }
+        
+        .prompt-block {
+            margin-bottom: 1.5rem;
+        }
+
+        .output-controls {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 0.5rem;
+            gap: 1rem;
+        }
+
+        .btn {
+            font-family: var(--font-primary);
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--accent-color-primary);
+            color: #fff;
+            box-shadow: 0 0 10px rgba(247, 37, 133, 0.5);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(247, 37, 133, 0.7); }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--accent-color-secondary);
+            border: 1px solid var(--accent-color-secondary);
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+        }
+        .btn-secondary:hover { background-color: var(--accent-color-secondary); color: var(--bg-color); }
+
+        .btn:active { transform: scale(0.98); }
+
+        #message-box {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--accent-color-secondary);
+            color: var(--bg-color);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transform: translateX(120%);
+            transition: transform 0.5s ease-in-out;
+            z-index: 1000;
+            font-weight: bold;
+        }
+        #message-box.show { transform: translateX(0); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header class="app-header">
+            <h1>Imagen Prompt Generator</h1>
+        </header>
+
+        <main>
+            <div class="form-grid">
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label><i class="ph-duotone ph-robot"></i>Target Model & Ratio</label>
+                    <div class="flex flex-wrap gap-4">
+                        <select id="model-type" class="input-base" style="max-width: 200px;">
+                            <option value="standard">Standard (SD 1.5/XL)</option>
+                            <option value="midjourney">Midjourney (--v 6)</option>
+                            <option value="anime">Anime (Pony/Niji)</option>
+                        </select>
+                        <select id="aspect-ratio" class="input-base" style="max-width: 200px;">
+                            <option value="">Aspect Ratio (Default)</option>
+                            <option value="1:1">1:1 (Square)</option>
+                            <option value="16:9">16:9 (Cinema)</option>
+                            <option value="9:16">9:16 (Portrait)</option>
+                            <option value="4:3">4:3 (Photo)</option>
+                            <option value="21:9">21:9 (Ultrawide)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label for="subject"><i class="ph-duotone ph-scan"></i>Subject (必須)</label>
+                    <input type="text" id="subject" class="input-base" placeholder="Ex: A silver-haired female knight, futuristic armor, glowing blue eyes">
+                </div>
+
+                <div class="form-group">
+                    <label for="style"><i class="ph-duotone ph-paint-brush"></i>Style</label>
+                    <select id="style" class="input-base">
+                        <option value="">Select Style</option>
+                        <option value="Photorealistic">Photorealistic</option>
+                        <option value="Anime Style">Anime / Cel Shaded</option>
+                        <option value="Cyberpunk">Cyberpunk</option>
+                        <option value="Steampunk">Steampunk</option>
+                        <option value="Dark Fantasy">Dark Fantasy</option>
+                        <option value="Oil Painting">Oil Painting (Impasto)</option>
+                        <option value="Unreal Engine 5">3D Render (UE5)</option>
+                        <option value="Ukiyo-e">Ukiyo-e</option>
+                        <option value="Pixel Art">Pixel Art</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="composition"><i class="ph-duotone ph-frame-corners"></i>Composition</label>
+                    <select id="composition" class="input-base">
+                        <option value="">Select Composition</option>
+                        <option value="full body">Full body shot</option>
+                        <option value="portrait">Portrait (Close-up)</option>
+                        <option value="cowboy shot">Cowboy shot (Thighs up)</option>
+                        <option value="dynamic pose">Dynamic Pose</option>
+                        <option value="dutch angle">Dutch Angle</option>
+                        <option value="bird's eye view">From Above (Bird's eye)</option>
+                        <option value="low angle">From Below (Low angle)</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label for="background"><i class="ph-duotone ph-image"></i>Background</label>
+                    <input type="text" id="background" class="input-base" placeholder="Ex: Ruined futuristic city with neon signs, raining">
+                </div>
+
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label><i class="ph-duotone ph-sparkle"></i>Mood & Effects</label>
+                    <div class="checkbox-group">
+                        <div class="custom-checkbox"><input type="checkbox" id="mood-masterpiece" value="masterpiece, best quality" checked><label for="mood-masterpiece">Masterpiece</label></div>
+                        <div class="custom-checkbox"><input type="checkbox" id="mood-detail" value="intricate details, highly detailed"><label for="mood-detail">High Detail</label></div>
+                        <div class="custom-checkbox"><input type="checkbox" id="mood-dark" value="dark atmosphere, moody lighting"><label for="mood-dark">Dark</label></div>
+                        <div class="custom-checkbox"><input type="checkbox" id="mood-vibrant" value="vibrant colors, vivid"><label for="mood-vibrant">Vibrant</label></div>
+                        <div class="custom-checkbox"><input type="checkbox" id="mood-bokeh" value="depth of field, bokeh"><label for="mood-bokeh">Bokeh</label></div>
+                        <div class="custom-checkbox"><input type="checkbox" id="mood-raytracing" value="ray tracing, global illumination"><label for="mood-raytracing">Ray Tracing</label></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="lighting"><i class="ph-duotone ph-lightbulb"></i>Lighting</label>
+                    <select id="lighting" class="input-base">
+                        <option value="">Select Lighting</option>
+                        <option value="cinematic lighting">Cinematic lighting</option>
+                        <option value="volumetric lighting">Volumetric lighting (God rays)</option>
+                        <option value="neon lighting">Neon lighting</option>
+                        <option value="soft lighting">Soft lighting</option>
+                        <option value="rembrandt lighting">Rembrandt lighting</option>
+                        <option value="backlight">Backlight / Rim light</option>
+                    </select>
+                </div>
+
+                 <div class="form-group">
+                    <label><i class="ph-duotone ph-medal"></i>Quality Tags</label>
+                    <div class="radio-group">
+                        <div class="custom-radio"><input type="radio" id="quality-std" name="quality" value="" checked><label for="quality-std">None</label></div>
+                        <div class="custom-radio"><input type="radio" id="quality-4k" name="quality" value="4k, 8k, ultra high res"><label for="quality-4k">4K/8K</label></div>
+                        <div class="custom-radio"><input type="radio" id="quality-raw" name="quality" value="raw photo, photorealistic"><label for="quality-raw">RAW</label></div>
+                    </div>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label for="negative-prompt"><i class="ph-duotone ph-prohibit"></i>Negative Prompt (除外要素)</label>
+                    <textarea id="negative-prompt" class="input-base" placeholder="low quality, worst quality, bad anatomy, deformed hands, missing fingers, watermark, text, signature">low quality, worst quality, bad anatomy, deformed hands, missing fingers, watermark, text, username, blurry</textarea>
+                </div>
+            </div>
+
+            <div class="flex justify-center mt-10">
+                <button id="generate-button" class="btn btn-primary"><i class="ph-duotone ph-shooting-star"></i>Generate Prompt</button>
+            </div>
+
+            <div class="output-area">
+                <div class="prompt-block">
+                    <label for="prompt-output"><i class="ph-duotone ph-terminal-window"></i>Positive Prompt</label>
+                    <textarea id="prompt-output" class="input-base" style="height: 120px;" readonly></textarea>
+                    <div class="output-controls">
+                        <button onclick="copyToClipboard('prompt-output')" class="btn btn-secondary"><i class="ph-duotone ph-copy"></i>Copy Positive</button>
+                    </div>
+                </div>
+
+                <div class="prompt-block">
+                    <label for="negative-output"><i class="ph-duotone ph-warning-circle"></i>Negative Prompt</label>
+                    <textarea id="negative-output" class="input-base" style="height: 80px;" readonly></textarea>
+                    <div class="output-controls">
+                        <button onclick="copyToClipboard('negative-output')" class="btn btn-secondary"><i class="ph-duotone ph-copy"></i>Copy Negative</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <div id="message-box"></div>
+
+    <script>
+        // TypeScriptのInterfaceをコメントとして記述し、構造を明確化
+        /*
+        interface PromptState {
+            subject: string;
+            style: string;
+            composition: string;
+            background: string;
+            lighting: string;
+            quality: string;
+            moods: string[];
+            modelType: 'standard' | 'midjourney' | 'anime';
+            aspectRatio: string;
+            negative: string;
+        }
+        */
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const getVal = (id) => document.getElementById(id).value.trim();
+            
+            const generatePrompt = () => {
+                const subjectInput = document.getElementById('subject');
+                const subject = getVal('subject');
+                
+                if (!subject) {
+                    subjectInput.classList.add('error');
+                    showToast('Error: Subject is required.');
+                    return;
+                }
+                subjectInput.classList.remove('error');
+
+                // データの収集
+                const style = getVal('style');
+                const composition = getVal('composition');
+                const background = getVal('background');
+                const lighting = getVal('lighting');
+                const modelType = getVal('model-type');
+                const aspectRatio = getVal('aspect-ratio');
+                const negativeInput = getVal('negative-prompt');
+
+                // チェックボックス (Mood)
+                const moodParts = [];
+                document.querySelectorAll('input[id^="mood-"]:checked').forEach(cb => moodParts.push(cb.value));
+
+                // ラジオボタン (Quality)
+                const qualityRadio = document.querySelector('input[name="quality"]:checked');
+                const quality = qualityRadio ? qualityRadio.value : '';
+
+                // --- プロンプト構築ロジック ---
+                let positiveParts = [];
+
+                // 1. スタイルと画質 (先頭に持ってくることが多い)
+                if (style) positiveParts.push(style);
+                if (quality) positiveParts.push(quality);
+
+                // 2. 主題 (最も重要)
+                positiveParts.push(subject);
+
+                // 3. 詳細・環境
+                if (composition) positiveParts.push(composition);
+                if (background) positiveParts.push(background);
+                if (lighting) positiveParts.push(lighting);
+                
+                // 4. ムード・追加効果
+                if (moodParts.length > 0) positiveParts.push(...moodParts);
+
+                // --- モデル別調整 ---
+                let finalPositive = positiveParts.filter(p => p).join(', ');
+                let finalNegative = negativeInput;
+
+                // Midjourneyの場合の特殊処理
+                if (modelType === 'midjourney') {
+                    // Midjourneyはカンマ区切りよりも自然言語に近い方が良い場合もあるが、
+                    // 基本はパラメータ付与
+                    if (aspectRatio) {
+                        // Convert "16:9" to "--ar 16:9"
+                        finalPositive += ` --ar ${aspectRatio}`;
+                    }
+                    finalPositive += ` --v 6.0`; // バージョン指定例
+                    
+                    // MidjourneyはNegative Promptを --no パラメータで指定する
+                    if (finalNegative) {
+                        finalPositive += ` --no ${finalNegative.replace(/,/g, ' ')}`; // カンマを除くことが多い
+                        finalNegative = "Midjourney uses '--no' parameter in the main prompt.";
+                    }
+                } else {
+                    // Standard (Stable Diffusion) / Anime
+                    // アニメモデルの場合の追加プロンプト
+                    if (modelType === 'anime') {
+                        finalPositive = `(anime source), (anime style), ${finalPositive}`;
+                    }
+                    // SDXLなどはAspect Ratioは生成時の設定で行うことが多いが、プロンプトには含めないのが一般的
+                    // ただし、Nano Banana等のサービスによってはタグで指定する場合もあるため、ここでは含めない
+                }
+
+                // 出力
+                document.getElementById('prompt-output').value = finalPositive;
+                document.getElementById('negative-output').value = finalNegative;
+            };
+
+            document.getElementById('generate-button').addEventListener('click', generatePrompt);
+        });
+
+        // クリップボードコピー関数 (汎用化)
+        function copyToClipboard(elementId) {
+            const el = document.getElementById(elementId);
+            if (!el.value || el.value.startsWith("Midjourney uses")) {
+                showToast('Nothing to copy.');
+                return;
+            }
+            el.select();
+            el.setSelectionRange(0, 99999);
+            try {
+                navigator.clipboard.writeText(el.value).then(() => {
+                     showToast('Copied to clipboard!');
+                });
+            } catch (err) {
+                console.error('Failed to copy', err);
+                showToast('Failed to copy.');
+            }
+        }
+
+        let toastTimer;
+        function showToast(message) {
+            const box = document.getElementById('message-box');
+            clearTimeout(toastTimer);
+            box.textContent = message;
+            box.classList.add('show');
+            toastTimer = setTimeout(() => {
+                box.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

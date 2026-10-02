@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Video Prompt Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/duotone/style.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --bg-color: #0D1117;
+            --panel-bg-color: #161B22;
+            --border-color: #30363D;
+            --accent-color-primary: #F72585;
+            --accent-color-secondary: #4CC9F0;
+            --text-color: #C9D1D9;
+            --text-color-secondary: #8B949E;
+            --font-primary: 'Orbitron', sans-serif;
+            --font-secondary: 'Rajdhani', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-secondary);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            background-image:
+                linear-gradient(rgba(22, 27, 34, 0.95), rgba(22, 27, 34, 0.95)),
+                url('https://placehold.co/1920x1080/0D1117/30363D?text=GRID');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background-color: var(--panel-bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5), 0 0 40px rgba(76, 201, 240, 0.2);
+            position: relative;
+            overflow: hidden;
+            padding: 2.5rem;
+        }
+
+        .container::before, .container::after {
+            content: '';
+            position: absolute;
+            width: 150px;
+            height: 2px;
+            background: var(--accent-color-secondary);
+            box-shadow: 0 0 5px var(--accent-color-secondary), 0 0 10px var(--accent-color-secondary);
+            animation: flicker 3s infinite linear;
+        }
+        .container::before { top: 0; left: -50px; transform: skewX(-45deg); }
+        .container::after { bottom: 0; right: -50px; transform: skewX(-45deg); }
+
+        @keyframes flicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+        .app-header h1 {
+            font-family: var(--font-primary);
+            color: #ddf;
+            text-align: center;
+            font-size: 2.5rem;
+            letter-spacing: 2px;
+            text-shadow: 0 0 5px var(--accent-color-secondary), 0 0 10px var(--accent-color-secondary);
+            margin-bottom: 0.5rem;
+        }
+        .app-header p {
+            text-align: center;
+            color: var(--text-color-secondary);
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .form-group label, .output-area > label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text-color-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .form-group label i, .output-area > label i {
+            font-size: 1.2rem;
+            color: var(--accent-color-secondary);
+            transition: color 0.3s ease;
+        }
+        .form-group:focus-within label i { color: var(--accent-color-primary); }
+
+        .input-base {
+            width: 100%;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 0.75rem;
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        .input-base:focus {
+            outline: none;
+            border-color: var(--accent-color-secondary);
+            box-shadow: 0 0 10px rgba(76, 201, 240, 0.5);
+        }
+        .input-base.error { border-color: #e60000; box-shadow: 0 0 10px rgba(230, 0, 0, 0.7); }
+
+        textarea.input-base {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .checkbox-group, .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .custom-checkbox, .custom-radio { position: relative; display: inline-block; }
+        .custom-checkbox input, .custom-radio input { opacity: 0; width: 0; height: 0; position: absolute; }
+
+        .custom-checkbox label, .custom-radio label {
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            user-select: none;
+            font-size: 0.9rem;
+            background: rgba(22, 27, 34, 0.5);
+            display: block;
+        }
+
+        .custom-checkbox input:checked + label, .custom-radio input:checked + label {
+            background-color: var(--accent-color-secondary);
+            color: var(--bg-color);
+            border-color: var(--accent-color-secondary);
+            box-shadow: 0 0 8px rgba(76, 201, 240, 0.6);
+            font-weight: bold;
+        }
+
+        .section-divider {
+            grid-column: 1 / -1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+            margin: 1rem 0;
+        }
+
+        .output-area { margin-top: 2rem; background: rgba(13, 17, 23, 0.5); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color); }
+        
+        .prompt-block { margin-bottom: 1.5rem; }
+
+        .output-controls {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 0.5rem;
+            gap: 1rem;
+        }
+
+        .btn {
+            font-family: var(--font-primary);
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--accent-color-primary);
+            color: #fff;
+            box-shadow: 0 0 10px rgba(247, 37, 133, 0.5);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(247, 37, 133, 0.7); }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--accent-color-secondary);
+            border: 1px solid var(--accent-color-secondary);
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+        }
+        .btn-secondary:hover { background-color: var(--accent-color-secondary); color: var(--bg-color); }
+
+        .btn:active { transform: scale(0.98); }
+
+        #message-box {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--accent-color-secondary);
+            color: var(--bg-color);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transform: translateX(120%);
+            transition: transform 0.5s ease-in-out;
+            z-index: 1000;
+            font-weight: bold;
+        }
+        #message-box.show { transform: translateX(0); }
+        
+        .helper-text {
+            font-size: 0.8rem;
+            color: var(--text-color-secondary);
+            margin-top: 0.25rem;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header class="app-header">
+            <h1>Video Prompt Generator</h1>
+            <p>Optimized for Seedance, Veo, and Sora architectures</p>
+        </header>
+
+        <main>
+            <div class="form-grid">
+                <!-- モデル選択 -->
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label><i class="ph-duotone ph-cpu"></i>Target AI Model</label>
+                    <select id="model-type" class="input-base" style="max-width: 300px;">
+                        <option value="veo">Veo (Google) - 物理法則と写実性重視</option>
+                        <option value="seedance">Seedance 1.0/2.0 - モーションと一貫性重視</option>
+                        <option value="sora">Sora (OpenAI) - 複雑なシーンとカメラワーク重視</option>
+                        <option value="gen3">Runway Gen-3 Alpha - タイミングと構造重視</option>
+                        <option value="general">汎用動画モデル</option>
+                    </select>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <!-- 主題 (Subject) -->
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label for="subject"><i class="ph-duotone ph-user-focus"></i>Subject (被写体 - 必須)</label>
+                    <input type="text" id="subject" class="input-base" placeholder="Ex: A heavy, solid metal robot with glowing blue eyes">
+                    <span class="helper-text">何を映すか。材質（Heavy, Solid, Metallic）を含めるとメルト（崩壊）しにくくなります。</span>
+                </div>
+
+                <!-- アクション/動き (Action & Motion) -->
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label for="action"><i class="ph-duotone ph-person-simple-run"></i>Action & Motion (被写体の動き)</label>
+                    <input type="text" id="action" class="input-base" placeholder="Ex: slowly walking across a concrete floor, head turning slightly">
+                    <span class="helper-text">被写体がどう動くか。「ゆっくり(slowly)」や「微細な(subtle)」を入れると安定します。</span>
+                </div>
+
+                <!-- カメラワーク (Camera Work) -->
+                <div class="form-group">
+                    <label for="camera"><i class="ph-duotone ph-video-camera"></i>Camera Work</label>
+                    <select id="camera" class="input-base">
+                        <option value="">Select Camera Motion (None)</option>
+                        <option value="Locked-off camera, static shot">Locked-off (固定カメラ/最も安定)</option>
+                        <option value="Slow zoom in">Slow Zoom In (ゆっくりズーム)</option>
+                        <option value="Cinematic slow pan from left to right">Slow Pan (ゆっくりパン)</option>
+                        <option value="Orbit shot circling around the subject">Orbit Shot (回り込み)</option>
+                        <option value="Low angle tracking shot">Tracking Shot (追従/ローアングル)</option>
+                        <option value="Handheld camera, slight shake">Handheld (手持ち/臨場感)</option>
+                    </select>
+                </div>
+
+                <!-- 環境/背景 (Environment) -->
+                <div class="form-group">
+                    <label for="background"><i class="ph-duotone ph-mountains"></i>Environment / Background</label>
+                    <input type="text" id="background" class="input-base" placeholder="Ex: dimly lit futuristic warehouse">
+                </div>
+
+                <div class="section-divider"></div>
+
+                <!-- 物理・安定性制御 (Physics & Stability) - 動画生成で最重要 -->
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label><i class="ph-duotone ph-cube"></i>Physics & Stability (構造破綻の防止)</label>
+                    <span class="helper-text mb-2">動画モデル特有のメルト（融解）や構造の変化を防ぐための強力なメタデータタグです。</span>
+                    <div class="checkbox-group">
+                        <div class="custom-checkbox"><input type="checkbox" id="phys-rigid" value="rigid structure, no morphing" checked><label for="phys-rigid">Rigid Structure (剛体/変形なし)</label></div>
+                        <div class="custom-checkbox"><input type="checkbox" id="phys-geometry" value="consistent geometry, maintaining shape"><label for="phys-geometry">Consistent Geometry (形状維持)</label></div>
+                        <div class="custom-checkbox"><input type="checkbox" id="phys-physics" value="realistic physics, accurate gravity"><label for="phys-physics">Realistic Physics (現実の物理法則)</label></div>
+                        <div class="custom-checkbox"><input type="checkbox" id="phys-weight" value="sense of heavy weight, solid material"><label for="phys-weight">Heavy Weight (重量感)</label></div>
+                        <div class="custom-checkbox"><input type="checkbox" id="phys-temporal" value="perfect temporal consistency"><label for="phys-temporal">Temporal Consistency (時間的一貫性)</label></div>
+                    </div>
+                </div>
+
+                <!-- スタイルと品質 (Style & Quality) -->
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label><i class="ph-duotone ph-sparkle"></i>Lighting & Quality</label>
+                    <div class="checkbox-group">
+                        <div class="custom-checkbox"><input type="checkbox" id="qual-cine" value="cinematic lighting, dramatic shadows" checked><label for="qual-cine">Cinematic Lighting</label></div>
+                        <div class="custom-checkbox"><input type="checkbox" id="qual-high" value="high fidelity, 8k resolution, photorealistic" checked><label for="qual-high">Photorealistic 8K</label></div>
+                        <div class="custom-checkbox"><input type="checkbox" id="qual-vol" value="volumetric fog, god rays"><label for="qual-vol">Volumetric Fog</label></div>
+                        <div class="custom-checkbox"><input type="checkbox" id="qual-motion" value="smooth motion blur"><label for="qual-motion">Smooth Motion Blur</label></div>
+                    </div>
+                </div>
+
+                <!-- ネガティブプロンプト (Negative Prompt) -->
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label for="negative-prompt"><i class="ph-duotone ph-prohibit"></i>Negative Prompt (動画用除外要素)</label>
+                    <textarea id="negative-prompt" class="input-base" placeholder="morphing, melting, unstable, deformed, bad anatomy">morphing, melting, unstable geometry, flickering, jittery, low framerate, mutated, bad anatomy, deformed limbs, floating objects, unrealistic physics, text, watermark</textarea>
+                    <span class="helper-text">動画特有の破綻（flickering, melting, morphing等）を指定しています。※Veoなど一部モデルはネガティブプロンプト非対応の場合があります。</span>
+                </div>
+            </div>
+
+            <div class="flex justify-center mt-10">
+                <button id="generate-button" class="btn btn-primary"><i class="ph-duotone ph-film-strip"></i>Generate Video Prompt</button>
+            </div>
+
+            <!-- 出力エリア -->
+            <div class="output-area">
+                <div class="prompt-block">
+                    <label for="prompt-output"><i class="ph-duotone ph-terminal-window"></i>Master Video Prompt</label>
+                    <textarea id="prompt-output" class="input-base" style="height: 150px; line-height: 1.5;" readonly></textarea>
+                    <div class="output-controls">
+                        <button onclick="copyToClipboard('prompt-output')" class="btn btn-secondary"><i class="ph-duotone ph-copy"></i>Copy Prompt</button>
+                    </div>
+                </div>
+
+                <div class="prompt-block">
+                    <label for="negative-output"><i class="ph-duotone ph-warning-circle"></i>Negative Prompt</label>
+                    <textarea id="negative-output" class="input-base" style="height: 80px;" readonly></textarea>
+                    <div class="output-controls">
+                        <button onclick="copyToClipboard('negative-output')" class="btn btn-secondary"><i class="ph-duotone ph-copy"></i>Copy Negative</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <div id="message-box"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const getVal = (id) => document.getElementById(id).value.trim();
+            
+            const generatePrompt = () => {
+                const subjectInput = document.getElementById('subject');
+                const subject = getVal('subject');
+                
+                if (!subject) {
+                    subjectInput.classList.add('error');
+                    showToast('Error: Subject (被写体) は必須です。');
+                    return;
+                }
+                subjectInput.classList.remove('error');
+
+                // データの収集
+                const modelType = getVal('model-type');
+                const action = getVal('action');
+                const camera = getVal('camera');
+                const background = getVal('background');
+                const negativeInput = getVal('negative-prompt');
+
+                // チェックボックスの収集
+                const getCheckedValues = (prefix) => {
+                    const values = [];
+                    document.querySelectorAll(`input[id^="${prefix}"]:checked`).forEach(cb => values.push(cb.value));
+                    return values;
+                };
+                const physicsParts = getCheckedValues('phys-');
+                const qualityParts = getCheckedValues('qual-');
+
+                // --- 動画用プロンプト構築ロジック ---
+                // 自然言語の文章（ピリオド区切り）として構築すると、最新の動画AIの理解度が高まる
+                let sentences = [];
+
+                // 1. カメラワーク (文頭に置くことでシーンの全体像を定義)
+                if (camera) {
+                    sentences.push(camera + ".");
+                }
+
+                // 2. 被写体とアクション (メインセンテンス)
+                let mainSentence = subject;
+                if (action) {
+                    // 主語とアクションを繋げる (例: A robot... + slowly walking...)
+                    mainSentence += " " + action;
+                }
+                sentences.push(mainSentence + ".");
+
+                // 3. 環境/背景
+                if (background) {
+                    sentences.push("Set in a " + background + ".");
+                }
+
+                // 4. 物理法則と構造の安定性 (動画AIにおける崩壊防止の要)
+                if (physicsParts.length > 0) {
+                    let physicsSentence = physicsParts.join(", ") + ".";
+                    // VeoやSeedance向けに、明示的に物理制約を強調する
+                    if (modelType === 'veo') {
+                        physicsSentence = "Strictly maintain " + physicsSentence;
+                    }
+                    sentences.push(physicsSentence);
+                }
+
+                // 5. スタイル、ライティング、画質
+                if (qualityParts.length > 0) {
+                    sentences.push(qualityParts.join(", ") + ".");
+                }
+
+                // --- 最終的な文字列生成 ---
+                let finalPositive = sentences.filter(s => s).join(" ");
+                let finalNegative = negativeInput;
+
+                // モデル別の微調整
+                if (modelType === 'sora') {
+                    // Soraは極めて詳細な描写を好むため、そのまま出力
+                } else if (modelType === 'gen3') {
+                    // Gen-3は短いキーワードベースも得意だが、自然言語も対応
+                } else if (modelType === 'veo') {
+                    // Veoはネガティブプロンプトをサポートしていないインターフェースが多い
+                    // （API仕様によるが、プロンプト内で否定形を使う方が効果的な場合がある）
+                }
+
+                // 出力
+                // 先頭を大文字にする処理
+                finalPositive = finalPositive.charAt(0).toUpperCase() + finalPositive.slice(1);
+                
+                document.getElementById('prompt-output').value = finalPositive;
+                document.getElementById('negative-output').value = finalNegative;
+            };
+
+            document.getElementById('generate-button').addEventListener('click', generatePrompt);
+        });
+
+        // iframe内でも動作する堅牢なクリップボードコピー関数
+        function copyToClipboard(elementId) {
+            const el = document.getElementById(elementId);
+            if (!el.value) {
+                showToast('コピーするテキストがありません。');
+                return;
+            }
+            
+            el.select();
+            el.setSelectionRange(0, 99999); // モバイル対応
+            
+            try {
+                // iframe環境の制限を回避するため、execCommandを優先的に使用
+                const successful = document.execCommand('copy');
+                if(successful) {
+                    showToast('クリップボードにコピーしました！');
+                } else {
+                    showToast('コピーに失敗しました。');
+                }
+            } catch (err) {
+                console.error('Failed to copy', err);
+                showToast('ブラウザがコピーをサポートしていません。');
+            }
+            
+            // 選択状態を解除
+            window.getSelection().removeAllRanges();
+        }
+
+        let toastTimer;
+        function showToast(message) {
+            const box = document.getElementById('message-box');
+            clearTimeout(toastTimer);
+            box.textContent = message;
+            box.classList.add('show');
+            toastTimer = setTimeout(() => {
+                box.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
