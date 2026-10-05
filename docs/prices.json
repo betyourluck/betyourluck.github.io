@@ -1,5 +1,5 @@
 {
- "_notice": "Derived from BerriAI/litellm model_prices_and_context_window.json (MIT License, Copyright (c) 2023 Berri AI), fetched 2026-08-18. Entries whose key contains a provider prefix (e.g. perplexity/, openai/ via Perplexity) were transcribed by hand from Perplexity's published pricing page on 2026-08-20; the same model can cost a different amount through a different gateway. Rates are approximate and provided as-is; verify against each provider's official pricing page. claude-fable-5-1 was transcribed by hand from Anthropic's first-party pricing on 2026-09-02 (cache read $0.25/MTok; other rates as claude-fable-5). max_input_tokens was added on 2026-09-05 from the same LiteLLM file as of that day (bare key first; prefixed candidates only when they agree; omitted when they disagree or are absent) — rates and keys were left untouched. On 2026-09-23 rates were refreshed from LiteLLM commit 721d39f: each entry was traced to the LiteLLM item whose rates it matched in the 2026-08-18 snapshot (commit f570af9), and only entries whose same item changed were updated (154); models that appeared in LiteLLM after 2026-08-18 were added (443) with the same bare-key-first rule. Hand-transcribed entries and entries whose source item left LiteLLM were not touched. On 2026-10-06 rates were refreshed from LiteLLM commit 9cc15e9 the same way (traced from commit 721d39f): 38 entries updated and 111 models added; hand-transcribed entries were not touched.",
+ "_notice": "Derived from BerriAI/litellm model_prices_and_context_window.json (MIT License, Copyright (c) 2023 Berri AI), fetched 2026-08-18. Entries whose key contains a provider prefix (e.g. perplexity/, openai/ via Perplexity) were transcribed by hand from Perplexity's published pricing page on 2026-08-20; the same model can cost a different amount through a different gateway. Rates are approximate and provided as-is; verify against each provider's official pricing page. claude-fable-5-1 was transcribed by hand from Anthropic's first-party pricing on 2026-09-02 (cache read $0.25/MTok; other rates as claude-fable-5). max_input_tokens was added on 2026-09-05 from the same LiteLLM file as of that day (bare key first; prefixed candidates only when they agree; omitted when they disagree or are absent) — rates and keys were left untouched. On 2026-09-23 rates were refreshed from LiteLLM commit 721d39f: each entry was traced to the LiteLLM item whose rates it matched in the 2026-08-18 snapshot (commit f570af9), and only entries whose same item changed were updated (154); models that appeared in LiteLLM after 2026-08-18 were added (443) with the same bare-key-first rule. Hand-transcribed entries and entries whose source item left LiteLLM were not touched. On 2026-10-06 rates were refreshed from LiteLLM commit 9cc15e9 the same way (traced from commit 721d39f): 38 entries updated and 111 models added; hand-transcribed entries were not touched. On 2026-10-06 jais-13b-chat and jais-30b-chat were removed: their LiteLLM rates exceed $1,000/MTok and Fuseforks rejects them as malformed.",
  "version": 1,
  "fetched": "2026-10-06",
  "models": [
@@ -8975,18 +8975,6 @@
    "max_input_tokens": 8192,
    "input_per_mtok": 15.0,
    "output_per_mtok": 15.0
-  },
-  {
-   "key": "jais-13b-chat",
-   "max_input_tokens": 8192,
-   "input_per_mtok": 500.0,
-   "output_per_mtok": 2000.0
-  },
-  {
-   "key": "jais-30b-chat",
-   "max_input_tokens": 8192,
-   "input_per_mtok": 3200.0,
-   "output_per_mtok": 9710.0
   },
   {
    "key": "jamba-1.5",
