@@ -2349,12 +2349,12 @@
             </button>
             <div class="faq-answer">
               <div class="lang-ja">
-                すべての会話データはローカルの `redb` に保存され、計測・解析・クラッシュ報告の送信はありません（そのための仕組みを組み込んでいません）。APIキーはOS標準のクレデンシャルストア（Windows Credential Manager / macOS Keychain / Secret Service）に暗号化保存されます。<br><br>
-                LLM 以外の外向き通信は<strong>モデル単価表の取得だけ</strong>で、<strong>利用者が「取得」ボタンを押したときにのみ</strong>行われます（起動時・定期的な確認はしません）。既定の取得先は開発者が用意した GitHub 上の静的ファイルで、<strong>設定画面から変更・空にできます</strong>。詳細はプライバシーポリシーに記載しています。
+                すべての会話データはローカルの <code>redb</code> に保存され、計測・解析・クラッシュ報告の送信はありません（そのための仕組みを組み込んでいません）。APIキーはOS標準のクレデンシャルストア（Windows Credential Manager / macOS Keychain / Secret Service）に暗号化保存されます。<br><br>
+                外部へ通信するのは、<strong>利用者が自分で設定した接続先</strong>（LLM のプロバイダ・MCP サーバーなど）と<strong>モデル単価表の取得先</strong>の 2 つだけです。単価表の取得は<strong>利用者が「取得」ボタンを押したときにのみ</strong>行われます（起動時・定期的な確認はしません）。既定の取得先は開発者が用意した GitHub 上の静的ファイルで、<strong>設定画面から変更・空にできます</strong>。OAuth の認可を選んだ MCP サーバーでは、その MCP サーバーが指定する認可サーバーとも通信します（ブラウザが開くのは「認可する」を押したときだけです）。詳細はプライバシーポリシーに記載しています。
               </div>
               <div class="lang-en">
                 All conversation data is persisted locally in <code>redb</code>. There is zero telemetry, tracking, or crash analytics embedded in the application. API keys are securely encrypted inside OS-level vaults (Windows Credential Manager, macOS Keychain, Linux Secret Service).<br><br>
-                The only non-LLM outbound network request is fetching the <strong>pricing reference table</strong>, which occurs <strong>strictly when the user clicks the "Fetch" button</strong> (never automatically at startup or periodically). The default endpoint is a static GitHub file, which you can <strong>modify or clear in Settings</strong>. Full details are documented in our Privacy Policy.
+                The app talks to only two kinds of destinations: <strong>endpoints you configure yourself</strong> (LLM providers, MCP servers and the like) and the <strong>pricing reference table</strong>. The table is fetched <strong>strictly when the user clicks the "Fetch" button</strong> (never automatically at startup or periodically). The default endpoint is a static GitHub file, which you can <strong>modify or clear in Settings</strong>. For an MCP server you choose to connect with OAuth, the app also talks to the authorization server that MCP server names (the browser opens only when you press "Authorize"). Full details are documented in our Privacy Policy.
               </div>
             </div>
           </div>
