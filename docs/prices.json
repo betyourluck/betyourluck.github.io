@@ -1,13 +1,27 @@
 {
- "_notice": "Derived from BerriAI/litellm model_prices_and_context_window.json (MIT License, Copyright (c) 2023 Berri AI), fetched 2026-08-18. Entries whose key contains a provider prefix (e.g. perplexity/, openai/ via Perplexity) were transcribed by hand from Perplexity's published pricing page on 2026-08-20; the same model can cost a different amount through a different gateway. Rates are approximate and provided as-is; verify against each provider's official pricing page. claude-fable-5-1 was transcribed by hand from Anthropic's first-party pricing on 2026-09-02 (cache read $0.25/MTok; other rates as claude-fable-5). max_input_tokens was added on 2026-09-05 from the same LiteLLM file as of that day (bare key first; prefixed candidates only when they agree; omitted when they disagree or are absent) — rates and keys were left untouched. On 2026-09-23 rates were refreshed from LiteLLM commit 721d39f: each entry was traced to the LiteLLM item whose rates it matched in the 2026-08-18 snapshot (commit f570af9), and only entries whose same item changed were updated (154); models that appeared in LiteLLM after 2026-08-18 were added (443) with the same bare-key-first rule. Hand-transcribed entries and entries whose source item left LiteLLM were not touched. On 2026-10-06 rates were refreshed from LiteLLM commit 9cc15e9 the same way (traced from commit 721d39f): 38 entries updated and 111 models added; hand-transcribed entries were not touched. On 2026-10-06 jais-13b-chat and jais-30b-chat were removed: their LiteLLM rates exceed $1,000/MTok and Fuseforks rejects them as malformed. On 2026-10-13 rates were refreshed from LiteLLM commit e5db66d the same way (traced from commit 9cc15e9): 21 entries updated and 30 models added; hand-transcribed entries were not touched.",
+ "_notice": "Derived from BerriAI/litellm model_prices_and_context_window.json (MIT License, Copyright (c) 2023 Berri AI), fetched 2026-08-18. Entries whose key contains a provider prefix (e.g. perplexity/, openai/ via Perplexity) were transcribed by hand from Perplexity's published pricing page on 2026-08-20; the same model can cost a different amount through a different gateway. Rates are approximate and provided as-is; verify against each provider's official pricing page. claude-fable-5-1 was transcribed by hand from Anthropic's first-party pricing on 2026-09-02 (cache read $0.25/MTok; other rates as claude-fable-5). max_input_tokens was added on 2026-09-05 from the same LiteLLM file as of that day (bare key first; prefixed candidates only when they agree; omitted when they disagree or are absent) — rates and keys were left untouched. On 2026-09-23 rates were refreshed from LiteLLM commit 721d39f: each entry was traced to the LiteLLM item whose rates it matched in the 2026-08-18 snapshot (commit f570af9), and only entries whose same item changed were updated (154); models that appeared in LiteLLM after 2026-08-18 were added (443) with the same bare-key-first rule. Hand-transcribed entries and entries whose source item left LiteLLM were not touched. On 2026-10-06 rates were refreshed from LiteLLM commit 9cc15e9 the same way (traced from commit 721d39f): 38 entries updated and 111 models added; hand-transcribed entries were not touched. On 2026-10-06 jais-13b-chat and jais-30b-chat were removed: their LiteLLM rates exceed $1,000/MTok and Fuseforks rejects them as malformed. On 2026-10-13 rates were refreshed from LiteLLM commit e5db66d the same way (traced from commit 9cc15e9): 21 entries updated and 30 models added; hand-transcribed entries were not touched. On 2026-10-20 rates were refreshed from LiteLLM commit 7ef9268 the same way (traced from commit e5db66d): 0 entries updated and 22 models added; hand-transcribed entries were not touched.",
  "version": 1,
- "fetched": "2026-10-13",
+ "fetched": "2026-10-20",
  "models": [
   {
    "key": "ALIA-40b-instruct_Q8_0",
    "max_input_tokens": 8192,
    "input_per_mtok": 0.0,
    "output_per_mtok": 0.0
+  },
+  {
+   "key": "Beam-1.0",
+   "max_input_tokens": 1048576,
+   "input_per_mtok": 1.3,
+   "output_per_mtok": 4.3,
+   "cache_read_per_mtok": 0.13
+  },
+  {
+   "key": "Beam-1.0-501B-A23B",
+   "max_input_tokens": 1048576,
+   "input_per_mtok": 0.4,
+   "output_per_mtok": 1.2,
+   "cache_read_per_mtok": 0.04
   },
   {
    "key": "CodeLlama-34b-Instruct-hf",
@@ -147,11 +161,25 @@
    "cache_read_per_mtok": 0
   },
   {
+   "key": "DeepSeek-V4.1-Flash-1017-Fast",
+   "max_input_tokens": 1048576,
+   "input_per_mtok": 0.6,
+   "output_per_mtok": 2.4,
+   "cache_read_per_mtok": 0.014
+  },
+  {
    "key": "DeepSeek-V4.1-Flash-Fast",
    "max_input_tokens": 1048576,
    "input_per_mtok": 0.6,
    "output_per_mtok": 2.4,
    "cache_read_per_mtok": 0.014
+  },
+  {
+   "key": "DeepSeek-V4.1-flash",
+   "max_input_tokens": 1000000,
+   "input_per_mtok": 0.15,
+   "output_per_mtok": 0.6,
+   "cache_read_per_mtok": 0.01
   },
   {
    "key": "Embeddings",
@@ -893,6 +921,13 @@
    "output_per_mtok": 0.15
   },
   {
+   "key": "Muse-Spark-Open-816B-A42B",
+   "max_input_tokens": 1048576,
+   "input_per_mtok": 1.25,
+   "output_per_mtok": 4.25,
+   "cache_read_per_mtok": 0.15
+  },
+  {
    "key": "MythoMax-L2-13b",
    "max_input_tokens": 4096,
    "input_per_mtok": 0.4,
@@ -923,6 +958,13 @@
    "input_per_mtok": 0.07,
    "output_per_mtok": 0.2,
    "cache_read_per_mtok": 0.04
+  },
+  {
+   "key": "NVIDIA-Nemotron-3.5-Super-VL",
+   "max_input_tokens": 262144,
+   "input_per_mtok": 0.15,
+   "output_per_mtok": 0.5,
+   "cache_read_per_mtok": 0.02
   },
   {
    "key": "NVIDIA-Nemotron-Nano-9B-v2",
@@ -2315,6 +2357,12 @@
    "output_per_mtok": 0.07
   },
   {
+   "key": "beam",
+   "max_input_tokens": 1048576,
+   "input_per_mtok": 0.25,
+   "output_per_mtok": 1.0
+  },
+  {
    "key": "bge-base-en-v1.5",
    "max_input_tokens": 512,
    "input_per_mtok": 0.008,
@@ -3024,6 +3072,15 @@
    "output_per_mtok": 20.0,
    "cache_read_per_mtok": 0.2,
    "cache_write_per_mtok": 5.0
+  },
+  {
+   "key": "claude-opus-5-5-fast",
+   "max_input_tokens": 1000000,
+   "input_per_mtok": 8.0,
+   "output_per_mtok": 40.0,
+   "cache_read_per_mtok": 0.4,
+   "cache_write_per_mtok": 10.0,
+   "cache_write_1h_per_mtok": 16.0
   },
   {
    "key": "claude-opus-5-5@default",
@@ -4715,6 +4772,13 @@
    "cache_write_per_mtok": 0.09
   },
   {
+   "key": "deepseek-v4.1-flash-maas",
+   "max_input_tokens": 1048576,
+   "input_per_mtok": 0.3,
+   "output_per_mtok": 1.2,
+   "cache_read_per_mtok": 0.03
+  },
+  {
    "key": "deepseek-v4.1-flash:batch",
    "max_input_tokens": 1048576,
    "input_per_mtok": 0.112,
@@ -4723,6 +4787,13 @@
   },
   {
    "key": "deepseek-v4p1-flash",
+   "max_input_tokens": 1048576,
+   "input_per_mtok": 0.3,
+   "output_per_mtok": 1.2,
+   "cache_read_per_mtok": 0.006
+  },
+  {
+   "key": "deepseek-v4p1-flash-1017",
    "max_input_tokens": 1048576,
    "input_per_mtok": 0.3,
    "output_per_mtok": 1.2,
@@ -5954,6 +6025,19 @@
    "output_per_mtok": 1.875,
    "cache_read_per_mtok": 0.0375,
    "cache_write_per_mtok": 0.041667
+  },
+  {
+   "key": "gemini-4-argon",
+   "input_per_mtok": 2.0,
+   "output_per_mtok": 10.0,
+   "cache_read_per_mtok": 0.1
+  },
+  {
+   "key": "gemini-4-argon-cyber-permissive",
+   "max_input_tokens": 1048576,
+   "input_per_mtok": 4.0,
+   "output_per_mtok": 20.0,
+   "cache_read_per_mtok": 0.2
   },
   {
    "key": "gemini-embedding-001",
@@ -7751,6 +7835,12 @@
    "cache_read_per_mtok": 1.25
   },
   {
+   "key": "gpt-5.5-cyber-preview",
+   "input_per_mtok": 12.5,
+   "output_per_mtok": 75.0,
+   "cache_read_per_mtok": 1.25
+  },
+  {
    "key": "gpt-5.5-pro",
    "max_input_tokens": 1050000,
    "input_per_mtok": 30.0,
@@ -9216,6 +9306,13 @@
    "output_per_mtok": 0.018
   },
   {
+   "key": "jp.amazon.nova-2-lite-v1:0",
+   "max_input_tokens": 1000000,
+   "input_per_mtok": 0.396,
+   "output_per_mtok": 3.311,
+   "cache_read_per_mtok": 0.099
+  },
+  {
    "key": "jp.anthropic.claude-haiku-4-5-20251001-v1:0",
    "max_input_tokens": 200000,
    "input_per_mtok": 1.1,
@@ -9434,6 +9531,14 @@
    "input_per_mtok": 1.9,
    "output_per_mtok": 7.999,
    "cache_read_per_mtok": 0.32167
+  },
+  {
+   "key": "kimi-k2.8-preview",
+   "max_input_tokens": 1000000,
+   "input_per_mtok": 1.0,
+   "output_per_mtok": 4.0,
+   "cache_read_per_mtok": 0.25,
+   "cache_write_per_mtok": 0.0
   },
   {
    "key": "kimi-k2p5",
@@ -11735,6 +11840,13 @@
    "cache_read_per_mtok": 0.002
   },
   {
+   "key": "muse-spark-open",
+   "max_input_tokens": 1048576,
+   "input_per_mtok": 1.25,
+   "output_per_mtok": 4.25,
+   "cache_read_per_mtok": 0.15
+  },
+  {
    "key": "muse-wonder-1.0",
    "max_input_tokens": 1048576,
    "input_per_mtok": 4.0,
@@ -13449,6 +13561,18 @@
    "output_per_mtok": 0.0
   },
   {
+   "key": "qwen3-vl",
+   "max_input_tokens": 262144,
+   "input_per_mtok": 0.26,
+   "output_per_mtok": 1.15
+  },
+  {
+   "key": "qwen3-vl-235b",
+   "max_input_tokens": 262144,
+   "input_per_mtok": 0.26,
+   "output_per_mtok": 1.15
+  },
+  {
    "key": "qwen3-vl-235b-a22b-instruct",
    "input_per_mtok": 0.4,
    "output_per_mtok": 1.6
@@ -15008,10 +15132,38 @@
    "output_per_mtok": 15.0
   },
   {
+   "key": "xai.grok-4.20-0309-non-reasoning",
+   "max_input_tokens": 1000000,
+   "input_per_mtok": 1.25,
+   "output_per_mtok": 2.5,
+   "cache_read_per_mtok": 0.2
+  },
+  {
+   "key": "xai.grok-4.20-0309-reasoning",
+   "max_input_tokens": 1000000,
+   "input_per_mtok": 1.25,
+   "output_per_mtok": 2.5,
+   "cache_read_per_mtok": 0.2
+  },
+  {
    "key": "xai.grok-4.20-multi-agent",
    "max_input_tokens": 131072,
    "input_per_mtok": 3.0,
    "output_per_mtok": 15.0
+  },
+  {
+   "key": "xai.grok-4.20-non-reasoning",
+   "max_input_tokens": 1000000,
+   "input_per_mtok": 1.25,
+   "output_per_mtok": 2.5,
+   "cache_read_per_mtok": 0.2
+  },
+  {
+   "key": "xai.grok-4.20-reasoning",
+   "max_input_tokens": 1000000,
+   "input_per_mtok": 1.25,
+   "output_per_mtok": 2.5,
+   "cache_read_per_mtok": 0.2
   },
   {
    "key": "xai.grok-4.3",
