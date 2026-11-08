@@ -1,5 +1,5 @@
 {
- "_notice": "Derived from BerriAI/litellm model_prices_and_context_window.json (MIT License, Copyright (c) 2023 Berri AI), fetched 2026-08-18. Entries whose key contains a provider prefix (e.g. perplexity/, openai/ via Perplexity) were transcribed by hand from Perplexity's published pricing page on 2026-08-20; the same model can cost a different amount through a different gateway. Rates are approximate and provided as-is; verify against each provider's official pricing page. claude-fable-5-1 was transcribed by hand from Anthropic's first-party pricing on 2026-09-02 (cache read $0.25/MTok; other rates as claude-fable-5). max_input_tokens was added on 2026-09-05 from the same LiteLLM file as of that day (bare key first; prefixed candidates only when they agree; omitted when they disagree or are absent) — rates and keys were left untouched. On 2026-09-23 rates were refreshed from LiteLLM commit 721d39f: each entry was traced to the LiteLLM item whose rates it matched in the 2026-08-18 snapshot (commit f570af9), and only entries whose same item changed were updated (154); models that appeared in LiteLLM after 2026-08-18 were added (443) with the same bare-key-first rule. Hand-transcribed entries and entries whose source item left LiteLLM were not touched. On 2026-10-06 rates were refreshed from LiteLLM commit 9cc15e9 the same way (traced from commit 721d39f): 38 entries updated and 111 models added; hand-transcribed entries were not touched. On 2026-10-06 jais-13b-chat and jais-30b-chat were removed: their LiteLLM rates exceed $1,000/MTok and Fuseforks rejects them as malformed. On 2026-10-13 rates were refreshed from LiteLLM commit e5db66d the same way (traced from commit 9cc15e9): 21 entries updated and 30 models added; hand-transcribed entries were not touched. On 2026-10-20 rates were refreshed from LiteLLM commit 7ef9268 the same way (traced from commit e5db66d): 0 entries updated and 22 models added; hand-transcribed entries were not touched. On 2026-10-29 rates were refreshed from LiteLLM commit 42d2909 the same way (traced from commit 7ef9268): 19 entries updated and 57 models added; hand-transcribed entries were not touched.",
+ "_notice": "Derived from BerriAI/litellm model_prices_and_context_window.json (MIT License, Copyright (c) 2023 Berri AI), fetched 2026-08-18. Entries whose key contains a provider prefix (e.g. perplexity/, openai/ via Perplexity) were transcribed by hand from Perplexity's published pricing page on 2026-08-20; the same model can cost a different amount through a different gateway. Rates are approximate and provided as-is; verify against each provider's official pricing page. claude-fable-5-1 was transcribed by hand from Anthropic's first-party pricing on 2026-09-02 (cache read $0.25/MTok; other rates as claude-fable-5). max_input_tokens was added on 2026-09-05 from the same LiteLLM file as of that day (bare key first; prefixed candidates only when they agree; omitted when they disagree or are absent) — rates and keys were left untouched. On 2026-09-23 rates were refreshed from LiteLLM commit 721d39f: each entry was traced to the LiteLLM item whose rates it matched in the 2026-08-18 snapshot (commit f570af9), and only entries whose same item changed were updated (154); models that appeared in LiteLLM after 2026-08-18 were added (443) with the same bare-key-first rule. Hand-transcribed entries and entries whose source item left LiteLLM were not touched. On 2026-10-06 rates were refreshed from LiteLLM commit 9cc15e9 the same way (traced from commit 721d39f): 38 entries updated and 111 models added; hand-transcribed entries were not touched. On 2026-10-06 jais-13b-chat and jais-30b-chat were removed: their LiteLLM rates exceed $1,000/MTok and Fuseforks rejects them as malformed. On 2026-10-13 rates were refreshed from LiteLLM commit e5db66d the same way (traced from commit 9cc15e9): 21 entries updated and 30 models added; hand-transcribed entries were not touched. On 2026-10-20 rates were refreshed from LiteLLM commit 7ef9268 the same way (traced from commit e5db66d): 0 entries updated and 22 models added; hand-transcribed entries were not touched. On 2026-10-29 rates were refreshed from LiteLLM commit 42d2909 the same way (traced from commit 7ef9268): 19 entries updated and 57 models added; hand-transcribed entries were not touched. On 2026-11-08 cache_write_1h_per_mtok was added by hand to claude-opus-5-5 ($8/MTok) and claude-mythos-5-1 ($20/MTok): Anthropic's prompt-caching documentation prices 1-hour cache writes at 2 times the base input price; no other entry was touched.",
  "version": 1,
  "fetched": "2026-10-29",
  "models": [
@@ -2867,7 +2867,8 @@
    "input_per_mtok": 10.0,
    "output_per_mtok": 50.0,
    "cache_read_per_mtok": 0.25,
-   "cache_write_per_mtok": 12.5
+   "cache_write_per_mtok": 12.5,
+   "cache_write_1h_per_mtok": 20.0
   },
   {
    "key": "claude-mythos-preview",
@@ -3132,7 +3133,8 @@
    "input_per_mtok": 4.0,
    "output_per_mtok": 20.0,
    "cache_read_per_mtok": 0.2,
-   "cache_write_per_mtok": 5.0
+   "cache_write_per_mtok": 5.0,
+   "cache_write_1h_per_mtok": 8.0
   },
   {
    "key": "claude-opus-5-5-fast",
