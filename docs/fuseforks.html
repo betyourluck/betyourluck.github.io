@@ -1925,10 +1925,10 @@
             <h3 class="feature-heading lang-ja">作業フォルダ外アクセスを構造的に遮断。<br>充実のビルトインツール</h3>
             <h3 class="feature-heading lang-en">Structurally Sandboxed Workspace Access.<br>Batteries-Included Tool Suite</h3>
             <p class="feature-text lang-ja">
-              `remember` / `grep` / `fd` / `diff` / `sd` / `yq` / `file` / `rag` / `run` を標準装備。ファイル操作ツールは構造的に作業フォルダ外を読み書きできないよう保護されています。
+              `remember` / `grep` / `fd` / `diff` / `sd` / `yq` / `file` / `rag` / `blackboard` / `run` / `image` / `fetch` を標準装備。ファイル操作ツールは構造的に作業フォルダ外を読み書きできないよう保護されています。web ページを読む `fetch` は既定でオフで、この端末のネットワークの中（localhost・プライベートアドレス）は読みません。
             </p>
             <p class="feature-text lang-en">
-              Equipped out-of-the-box with <code>remember</code>, <code>grep</code>, <code>fd</code>, <code>diff</code>, <code>sd</code>, <code>yq</code>, <code>file</code>, <code>rag</code>, and <code>run</code>. File system tools are structurally restricted from traversing outside the workspace directory.
+              Equipped out-of-the-box with <code>remember</code>, <code>grep</code>, <code>fd</code>, <code>diff</code>, <code>sd</code>, <code>yq</code>, <code>file</code>, <code>rag</code>, <code>blackboard</code>, <code>run</code>, <code>image</code>, and <code>fetch</code>. File system tools are structurally restricted from traversing outside the workspace directory. <code>fetch</code>, which reads web pages, is off by default and never reads inside this machine's network (localhost, private addresses).
             </p>
             <ul class="feature-list lang-ja">
               <li class="feature-list-item">
@@ -1939,6 +1939,10 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 <span><strong>OS Keyringによる暗号化保管</strong>: APIキーは平文設定ファイルに保存されません</span>
               </li>
+              <li class="feature-list-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span><strong>Docker 不要の web 取得 (fetch)</strong>: 本文の抽出・文字コード・robots.txt をアプリの中で扱い、web ページを Markdown で読む</span>
+              </li>
             </ul>
             <ul class="feature-list lang-en">
               <li class="feature-list-item">
@@ -1948,6 +1952,10 @@
               <li class="feature-list-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 <span><strong>Encrypted OS Keyring Storage</strong>: API keys are securely kept in OS-level vaults, never stored in plain-text config files</span>
+              </li>
+              <li class="feature-list-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span><strong>Web Fetching Without Docker</strong>: <code>fetch</code> reads web pages as Markdown, handling main-text extraction, character encodings and robots.txt inside the app</span>
               </li>
             </ul>
           </div>
@@ -1961,7 +1969,10 @@
               <div class="tool-chip">yq</div>
               <div class="tool-chip">file</div>
               <div class="tool-chip">rag</div>
+              <div class="tool-chip">blackboard</div>
               <div class="tool-chip">run</div>
+              <div class="tool-chip">image</div>
+              <div class="tool-chip">fetch</div>
             </div>
           </div>
         </div>
@@ -2350,11 +2361,11 @@
             <div class="faq-answer">
               <div class="lang-ja">
                 すべての会話データはローカルの <code>redb</code> に保存され、計測・解析・クラッシュ報告の送信はありません（そのための仕組みを組み込んでいません）。APIキーはOS標準のクレデンシャルストア（Windows Credential Manager / macOS Keychain / Secret Service）に暗号化保存されます。<br><br>
-                外部へ通信するのは、<strong>利用者が自分で設定した接続先</strong>（LLM のプロバイダ・MCP サーバーなど）と<strong>モデル単価表の取得先</strong>の 2 つだけです。単価表の取得は<strong>利用者が「取得」ボタンを押したときにのみ</strong>行われます（起動時・定期的な確認はしません）。既定の取得先は開発者が用意した GitHub 上の静的ファイルで、<strong>設定画面から変更・空にできます</strong>。OAuth の認可を選んだ MCP サーバーでは、その MCP サーバーが指定する認可サーバーとも通信します（ブラウザが開くのは「認可する」を押したときだけです）。詳細はプライバシーポリシーに記載しています。
+                外部へ通信するのは、<strong>利用者が自分で設定した接続先</strong>（LLM のプロバイダ・MCP サーバーなど）と<strong>モデル単価表の取得先</strong>の 2 つです。単価表の取得は<strong>利用者が「取得」ボタンを押したときにのみ</strong>行われます（起動時・定期的な確認はしません）。既定の取得先は開発者が用意した GitHub 上の静的ファイルで、<strong>設定画面から変更・空にできます</strong>。OAuth の認可を選んだ MCP サーバーでは、その MCP サーバーが指定する認可サーバーとも通信します（ブラウザが開くのは「認可する」を押したときだけです）。<strong>例外は web の取得（<code>fetch</code>）</strong>で、利用者がエージェントごとに有効にすると、そのエージェントのモデルが選んだ web ページへアプリが直接取りに行きます（既定ではオフ。この端末のネットワークの中へは行きません）。詳細はプライバシーポリシーに記載しています。
               </div>
               <div class="lang-en">
                 All conversation data is persisted locally in <code>redb</code>. There is zero telemetry, tracking, or crash analytics embedded in the application. API keys are securely encrypted inside OS-level vaults (Windows Credential Manager, macOS Keychain, Linux Secret Service).<br><br>
-                The app talks to only two kinds of destinations: <strong>endpoints you configure yourself</strong> (LLM providers, MCP servers and the like) and the <strong>pricing reference table</strong>. The table is fetched <strong>strictly when the user clicks the "Fetch" button</strong> (never automatically at startup or periodically). The default endpoint is a static GitHub file, which you can <strong>modify or clear in Settings</strong>. For an MCP server you choose to connect with OAuth, the app also talks to the authorization server that MCP server names (the browser opens only when you press "Authorize"). Full details are documented in our Privacy Policy.
+                The app talks to two kinds of destinations: <strong>endpoints you configure yourself</strong> (LLM providers, MCP servers and the like) and the <strong>pricing reference table</strong>. The table is fetched <strong>strictly when the user clicks the "Fetch" button</strong> (never automatically at startup or periodically). The default endpoint is a static GitHub file, which you can <strong>modify or clear in Settings</strong>. For an MCP server you choose to connect with OAuth, the app also talks to the authorization server that MCP server names (the browser opens only when you press "Authorize"). <strong>The exception is web fetching (<code>fetch</code>)</strong>: when you turn it on for an agent, the app itself goes to web pages that agent's model chooses (off by default; it never reaches inside this machine's network). Full details are documented in our Privacy Policy.
               </div>
             </div>
           </div>
